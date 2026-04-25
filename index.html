@@ -912,19 +912,26 @@
     if (!currentFlight) return;
     const from = currentFlight.from_code || 'IST';
     const to = currentFlight.to_code || '';
-    const dep = currentFlight.departure_date || '';
-    const ret = currentFlight.return_date || '';
-    const type = currentFlight.trip_type === 'round_trip' ? '1' : '2';
 
-    // Google Flights deep link with dates
-    let url = `https://www.google.com/travel/flights/search?tfs=CBwQAhoeEgoyMDI1LTAzLTE1agcIARIDSVNUcgcIARIDQU1TGh4SCjIwMjUtMDMtMjJqBwgBEgNBTVNyBwgBEgNJU1Q`;
+    function toSkyDate(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      const yy = String(d.getFullYear()).slice(2);
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yy}${mm}${dd}`;
+    }
 
-    // Simpler fallback URL with query params
-    if (dep) {
-      url = `https://www.google.com/travel/flights?q=Flights+from+${from}+to+${to}&date=${dep}`;
-      if (ret) url += `&return=${ret}`;
+    const dep = toSkyDate(currentFlight.departure_date);
+    const ret = toSkyDate(currentFlight.return_date);
+
+    let url;
+    if (dep && ret) {
+      url = `https://www.skyscanner.com.tr/transport/flights/${from}/${to}/${dep}/${ret}/`;
+    } else if (dep) {
+      url = `https://www.skyscanner.com.tr/transport/flights/${from}/${to}/${dep}/`;
     } else {
-      url = `https://www.google.com/travel/flights?q=Flights+from+${from}+to+${to}`;
+      url = `https://www.skyscanner.com.tr/transport/flights/${from}/${to}/`;
     }
 
     window.open(url, '_blank');
