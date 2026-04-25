@@ -397,6 +397,24 @@
 
   .card-cta:hover { background: var(--accent); border-color: var(--accent); color: white; }
 
+  .card-sky-btn {
+    background: #0770e3;
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', system-ui, sans-serif;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .card-sky-btn:hover { background: #0558b0; transform: translateY(-1px); }
+
   /* LOADING */
   .loading {
     text-align: center;
@@ -724,7 +742,7 @@
       </div>
     </div>
     <div class="modal-note" id="modalNote"></div>
-    <button class="modal-cta" id="modalCta" onclick="openFlights()">Google Flights'ta Gör →</button>
+    <button class="modal-cta" id="modalCta" onclick="openFlights()">✈️ Skyscanner'da Gör</button>
   </div>
 </div>
 
@@ -816,7 +834,12 @@
         </div>
         <div class="card-footer">
           <div class="card-airline">${logo} ${f.airlines?.name || f.airline_id || ''}</div>
-          <button class="card-cta">İncele →</button>
+          <div style="display:flex;gap:8px">
+            <button class="card-cta" onclick="event.stopPropagation();openModal(${f.id})">İncele →</button>
+            <button class="card-sky-btn" onclick="event.stopPropagation();openSkyscanner(${f.id})">
+              ✈️ Skyscanner
+            </button>
+          </div>
         </div>
       </div>`;
   }
@@ -908,23 +931,22 @@
     if (e.target === document.getElementById('modal')) closeModal();
   }
 
-  function openFlights() {
-    if (!currentFlight) return;
-    const from = currentFlight.from_code || 'IST';
-    const to = currentFlight.to_code || '';
+  function toSkyDate(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    const yy = String(d.getFullYear()).slice(2);
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yy}${mm}${dd}`;
+  }
 
-    function toSkyDate(dateStr) {
-      if (!dateStr) return '';
-      const d = new Date(dateStr);
-      const yy = String(d.getFullYear()).slice(2);
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      return `${yy}${mm}${dd}`;
-    }
-
-    const dep = toSkyDate(currentFlight.departure_date);
-    const ret = toSkyDate(currentFlight.return_date);
-
+  function openSkyscanner(id) {
+    const f = id ? allFlights.find(x => x.id === id) : currentFlight;
+    if (!f) return;
+    const from = f.from_code || 'IST';
+    const to = f.to_code || '';
+    const dep = toSkyDate(f.departure_date);
+    const ret = toSkyDate(f.return_date);
     let url;
     if (dep && ret) {
       url = `https://www.skyscanner.com.tr/transport/flights/${from}/${to}/${dep}/${ret}/`;
@@ -933,8 +955,11 @@
     } else {
       url = `https://www.skyscanner.com.tr/transport/flights/${from}/${to}/`;
     }
-
     window.open(url, '_blank');
+  }
+
+  function openFlights() {
+    openSkyscanner(null);
   }
 
   function handleSubscribe() {
