@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golow Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #f5f6fa;
+    --surface: #ffffff;
+    --border: #e4e6f0;
+    --text: #1a1a2e;
+    --muted: #8890a8;
+    --accent: #1e6ff0;
+    --green: #00b87a;
+    --yellow: #f0b400;
+    --blue: #1aa3d4;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* LOGIN */
+  .login-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+
+  .login-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px;
+    width: 360px;
+    text-align: center;
+  }
+
+  .login-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .login-logo span { color: var(--accent); }
+  .login-sub { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+
+  .form-group { margin-bottom: 16px; text-align: left; }
+
+  .form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--accent);
+  }
+
+  .form-select { cursor: pointer; }
+  .form-textarea { resize: vertical; min-height: 80px; }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #1558d6; transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-danger { background: rgba(255,77,109,0.15); color: var(--accent); border: 1px solid rgba(255,77,109,0.3); }
+  .btn-danger:hover { background: var(--accent); color: white; }
+  .btn-sm { width: auto; padding: 6px 14px; font-size: 12px; }
+  .btn-success { background: rgba(0,229,160,0.15); color: var(--green); border: 1px solid rgba(0,229,160,0.3); }
+  .btn-success:hover { background: var(--green); color: var(--bg); }
+
+  .error-msg { color: var(--accent); font-size: 13px; margin-top: 8px; text-align: center; }
+
+  /* ADMIN LAYOUT */
+  .admin { display: none; }
+  .admin.visible { display: block; }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(245,246,250,0.95);
+    backdrop-filter: blur(20px);
+    z-index: 100;
+  }
+
+  .header-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+  }
+
+  .header-logo span { color: var(--accent); }
+  .header-badge {
+    background: rgba(255,214,10,0.15);
+    color: var(--yellow);
+    border: 1px solid rgba(255,214,10,0.3);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-left: 10px;
+  }
+
+  .header-actions { display: flex; gap: 12px; align-items: center; }
+
+  .main { padding: 40px; }
+
+  /* STATS */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .stat-value { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; }
+
+  /* FORM CARD */
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 40px;
+  }
+
+  .form-card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .form-grid .form-group { margin-bottom: 0; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* FLIGHTS TABLE */
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 14px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(30,30,46,0.5);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-hot { background: rgba(255,77,109,0.2); color: var(--accent); }
+  .badge-good { background: rgba(0,229,160,0.15); color: var(--green); }
+  .badge-new { background: rgba(76,201,240,0.15); color: var(--blue); }
+  .badge-alert { background: rgba(255,214,10,0.15); color: var(--yellow); }
+
+  .status-on { color: var(--green); font-size: 12px; }
+  .status-off { color: var(--muted); font-size: 12px; }
+
+  .td-actions { display: flex; gap: 8px; }
+
+  .loading-row td { text-align: center; padding: 40px; color: var(--muted); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-size: 14px;
+    z-index: 999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-color: var(--green); color: var(--green); }
+  .toast.error { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">Go<span>low</span></div>
+    <div class="login-sub">Admin Paneli</div>
+    <div class="form-group">
+      <label class="form-label">E-posta</label>
+      <input type="email" class="form-input" id="loginEmail" placeholder="golowtr@gmail.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Şifre</label>
+      <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
+    </div>
+    <button class="btn btn-primary" onclick="login()">Giriş Yap</button>
+    <div class="error-msg" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="admin" id="adminPanel">
+  <header>
+    <div>
+      <span class="header-logo">Go<span>low</span></span>
+      <span class="header-badge">ADMIN</span>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" target="_blank" class="btn btn-secondary btn-sm">Siteyi Gör →</a>
+      <button class="btn btn-secondary btn-sm" onclick="logout()">Çıkış</button>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Toplam Fırsat</div>
+        <div class="stat-value" id="statTotal">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Aktif</div>
+        <div class="stat-value" style="color:var(--green)" id="statActive">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Pasif</div>
+        <div class="stat-value" style="color:var(--muted)" id="statPassive">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Hata Fiyatı</div>
+        <div class="stat-value" style="color:var(--accent)" id="statHot">—</div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <div class="form-card">
+      <div class="form-card-title">
+        <span id="formIcon">➕</span>
+        <span id="formTitle">Yeni Fırsat Ekle</span>
+      </div>
+      <input type="hidden" id="editId">
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Nereden Şehir</label>
+          <input type="text" class="form-input" id="fromCity" placeholder="İstanbul" value="İstanbul">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nereden Kod</label>
+          <input type="text" class="form-input" id="fromCode" placeholder="IST" value="IST" maxlength="3" style="text-transform:uppercase">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nereye Şehir</label>
+          <input type="text" class="form-input" id="toCity" placeholder="Amsterdam">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nereye Kod</label>
+          <input type="text" class="form-input" id="toCode" placeholder="AMS" maxlength="3" style="text-transform:uppercase">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fiyat (₺)</label>
+          <input type="number" class="form-input" id="price" placeholder="890">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Normal Fiyat (₺)</label>
+          <input type="number" class="form-input" id="normalPrice" placeholder="3200">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Uçuş Tipi</label>
+          <select class="form-select" id="tripType">
+            <option value="round_trip">Gidiş-Dönüş</option>
+            <option value="one_way">Tek Yön</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Aciliyet</label>
+          <select class="form-select" id="urgency">
+            <option value="good">✅ Çok İyi</option>
+            <option value="hot">🔥 Hata Fiyatı</option>
+            <option value="new">🆕 Yeni</option>
+            <option value="alert">⚡ Fırsat</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Gidiş Tarihi</label>
+          <input type="date" class="form-input" id="departureDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Dönüş Tarihi</label>
+          <input type="date" class="form-input" id="returnDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Son Alım Tarihi</label>
+          <input type="date" class="form-input" id="bookingDeadline">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Durum</label>
+          <select class="form-select" id="active">
+            <option value="true">✅ Aktif</option>
+            <option value="false">⏸️ Pasif</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Editör Notu</label>
+          <textarea class="form-textarea" id="editorNote" placeholder="Bu fırsat hakkında kısa bir not..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="saveFlight()" style="max-width:200px">Kaydet</button>
+        <button class="btn btn-secondary" onclick="resetForm()" style="max-width:140px">Temizle</button>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+      <div class="table-header">
+        <span class="table-title">Tüm Fırsatlar</span>
+        <button class="btn btn-secondary btn-sm" onclick="loadFlights()">🔄 Yenile</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Rota</th>
+              <th>Fiyat</th>
+              <th>İndirim</th>
+              <th>Uçuş Tipi</th>
+              <th>Aciliyet</th>
+              <th>Gidiş</th>
+              <th>Durum</th>
+              <th>İşlem</th>
+            </tr>
+          </thead>
+          <tbody id="flightsTable">
+            <tr class="loading-row"><td colspan="8">Yükleniyor...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const SUPABASE_URL = 'https://resssdiuypnweoaxpkoq.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_hCfDQcIvplQYApiHd4VX5A_U-wWT9Qr';
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // AUTH
+  async function login() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const err = document.getElementById('loginError');
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      err.textContent = 'Hatalı e-posta veya şifre.';
+    } else {
+      showAdmin();
+    }
+  }
+
+  async function logout() {
+    await supabase.auth.signOut();
+    document.getElementById('adminPanel').classList.remove('visible');
+    document.getElementById('loginScreen').style.display = 'flex';
+  }
+
+  async function checkAuth() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      showAdmin();
+    }
+  }
+
+  function showAdmin() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminPanel').classList.add('visible');
+    loadFlights();
+  }
+
+  // TOAST
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // HELPERS
+  function calcDiscount(price, normal) {
+    if (!price || !normal) return null;
+    return Math.round((1 - price / normal) * 100);
+  }
+
+  function formatDate(d) {
+    if (!d) return '—';
+    return new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+  }
+
+  const badgeMap = {
+    hot: '<span class="badge badge-hot">🔥 HATA</span>',
+    good: '<span class="badge badge-good">✅ İYİ</span>',
+    new: '<span class="badge badge-new">🆕 YENİ</span>',
+    alert: '<span class="badge badge-alert">⚡ FIRSAT</span>'
+  };
+
+  // LOAD
+  async function loadFlights() {
+    const { data, error } = await supabase
+      .from('flights')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) { showToast('Yükleme hatası', 'error'); return; }
+
+    const flights = data || [];
+    const active = flights.filter(f => f.active).length;
+
+    document.getElementById('statTotal').textContent = flights.length;
+    document.getElementById('statActive').textContent = active;
+    document.getElementById('statPassive').textContent = flights.length - active;
+    document.getElementById('statHot').textContent = flights.filter(f => f.urgency === 'hot').length;
+
+    const tbody = document.getElementById('flightsTable');
+
+    if (!flights.length) {
+      tbody.innerHTML = '<tr class="loading-row"><td colspan="8">Henüz fırsat yok. Yukarıdan ekleyin.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = flights.map(f => {
+      const disc = calcDiscount(f.price, f.normal_price);
+      return `
+        <tr>
+          <td><strong>${f.from_code || 'IST'} → ${f.to_code || f.to_city}</strong><br>
+              <small style="color:var(--muted)">${f.from_city} → ${f.to_city}</small></td>
+          <td><strong>₺${Number(f.price).toLocaleString('tr-TR')}</strong></td>
+          <td>${disc ? `%${disc}` : '—'}</td>
+          <td>${f.trip_type === 'round_trip' ? 'Gidiş-dönüş' : 'Tek yön'}</td>
+          <td>${badgeMap[f.urgency] || '—'}</td>
+          <td>${formatDate(f.departure_date)}</td>
+          <td>${f.active
+            ? '<span class="status-on">● Aktif</span>'
+            : '<span class="status-off">○ Pasif</span>'}</td>
+          <td>
+            <div class="td-actions">
+              <button class="btn btn-secondary btn-sm" onclick="editFlight(${f.id})">Düzenle</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteFlight(${f.id})">Sil</button>
+              <button class="btn btn-success btn-sm" onclick="toggleActive(${f.id}, ${f.active})">${f.active ? 'Pasif Et' : 'Aktif Et'}</button>
+            </div>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  // SAVE
+  async function saveFlight() {
+    const editId = document.getElementById('editId').value;
+
+    const payload = {
+      from_city: document.getElementById('fromCity').value,
+      from_code: document.getElementById('fromCode').value.toUpperCase(),
+      to_city: document.getElementById('toCity').value,
+      to_code: document.getElementById('toCode').value.toUpperCase(),
+      price: parseFloat(document.getElementById('price').value) || null,
+      normal_price: parseFloat(document.getElementById('normalPrice').value) || null,
+      trip_type: document.getElementById('tripType').value,
+      urgency: document.getElementById('urgency').value,
+      departure_date: document.getElementById('departureDate').value || null,
+      return_date: document.getElementById('returnDate').value || null,
+      booking_deadline: document.getElementById('bookingDeadline').value || null,
+      editor_note: document.getElementById('editorNote').value || null,
+      active: document.getElementById('active').value === 'true',
+    };
+
+    if (!payload.to_city || !payload.price) {
+      showToast('Nereye şehri ve fiyat zorunlu!', 'error');
+      return;
+    }
+
+    let error;
+    if (editId) {
+      ({ error } = await supabase.from('flights').update(payload).eq('id', editId));
+    } else {
+      ({ error } = await supabase.from('flights').insert(payload));
+    }
+
+    if (error) {
+      showToast('Kayıt hatası: ' + error.message, 'error');
+    } else {
+      showToast(editId ? '✅ Güncellendi!' : '✅ Fırsat eklendi!');
+      resetForm();
+      loadFlights();
+    }
+  }
+
+  // EDIT
+  let allFlightsData = [];
+
+  async function editFlight(id) {
+    const { data } = await supabase.from('flights').select('*').eq('id', id).single();
+    if (!data) return;
+
+    document.getElementById('editId').value = data.id;
+    document.getElementById('formTitle').textContent = 'Fırsatı Düzenle';
+    document.getElementById('formIcon').textContent = '✏️';
+    document.getElementById('fromCity').value = data.from_city || '';
+    document.getElementById('fromCode').value = data.from_code || '';
+    document.getElementById('toCity').value = data.to_city || '';
+    document.getElementById('toCode').value = data.to_code || '';
+    document.getElementById('price').value = data.price || '';
+    document.getElementById('normalPrice').value = data.normal_price || '';
+    document.getElementById('tripType').value = data.trip_type || 'round_trip';
+    document.getElementById('urgency').value = data.urgency || 'good';
+    document.getElementById('departureDate').value = data.departure_date || '';
+    document.getElementById('returnDate').value = data.return_date || '';
+    document.getElementById('bookingDeadline').value = data.booking_deadline || '';
+    document.getElementById('editorNote').value = data.editor_note || '';
+    document.getElementById('active').value = data.active ? 'true' : 'false';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // DELETE
+  async function deleteFlight(id) {
+    if (!confirm('Bu fırsatı silmek istediğine emin misin?')) return;
+    const { error } = await supabase.from('flights').delete().eq('id', id);
+    if (error) showToast('Silme hatası', 'error');
+    else { showToast('🗑️ Silindi'); loadFlights(); }
+  }
+
+  // TOGGLE
+  async function toggleActive(id, current) {
+    const { error } = await supabase.from('flights').update({ active: !current }).eq('id', id);
+    if (error) showToast('Hata', 'error');
+    else { showToast(current ? '⏸️ Pasife alındı' : '✅ Aktif edildi'); loadFlights(); }
+  }
+
+  // RESET
+  function resetForm() {
+    document.getElementById('editId').value = '';
+    document.getElementById('formTitle').textContent = 'Yeni Fırsat Ekle';
+    document.getElementById('formIcon').textContent = '➕';
+    ['fromCity','fromCode','toCity','toCode','price','normalPrice',
+     'departureDate','returnDate','bookingDeadline','editorNote'].forEach(id => {
+      document.getElementById(id).value = id === 'fromCity' ? 'İstanbul' : id === 'fromCode' ? 'IST' : '';
+    });
+    document.getElementById('tripType').value = 'round_trip';
+    document.getElementById('urgency').value = 'good';
+    document.getElementById('active').value = 'true';
+  }
+
+  checkAuth();
+</script>
+</body>
+</html>

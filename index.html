@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golow — Uçuş Fırsatları</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #f5f6fa;
+    --surface: #ffffff;
+    --border: #e4e6f0;
+    --text: #1a1a2e;
+    --muted: #8890a8;
+    --accent: #1e6ff0;
+    --green: #00b87a;
+    --yellow: #f0b400;
+    --blue: #1aa3d4;
+    --orange: #e85d20;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(245,246,250,0.95);
+    backdrop-filter: blur(20px);
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    letter-spacing: -1px;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .logo span { color: var(--accent); }
+
+  .nav-badge {
+    background: var(--accent);
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    margin-left: 8px;
+    animation: pulse 2s infinite;
+    vertical-align: middle;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+  .subscribe-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .subscribe-btn:hover { background: #1558d6; transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    padding: 60px 40px 40px;
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,229,160,0.1);
+    border: 1px solid rgba(0,229,160,0.3);
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  .dot {
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 em { font-style: normal; color: var(--accent); }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 16px;
+    max-width: 480px;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+
+  /* TICKER */
+  .ticker-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 48px;
+  }
+
+  .ticker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ticker-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .ticker-live {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 500;
+  }
+
+  .ticker-scroll { overflow: hidden; padding: 14px 0; }
+
+  .ticker-track {
+    display: flex;
+    animation: ticker 30s linear infinite;
+    white-space: nowrap;
+  }
+
+  .ticker-track:hover { animation-play-state: paused; }
+
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 24px;
+    border-right: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .ticker-route { font-family: 'Syne', sans-serif; font-weight: 700; }
+  .ticker-price { font-weight: 600; color: var(--green); }
+  .ticker-pct {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    background: rgba(0,229,160,0.15);
+    color: var(--green);
+  }
+  .ticker-pct.hot { background: rgba(255,77,109,0.15); color: var(--accent); }
+
+  /* SECTION */
+  .section { padding: 0 40px 60px; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .section-count { font-size: 13px; color: var(--muted); }
+
+  /* FILTERS */
+  .filters { display: flex; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
+
+  .filter {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .filter:hover, .filter.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  /* CARDS */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .card:hover {
+    border-color: rgba(30,111,240,0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(30,111,240,0.08);
+  }
+
+  .card:hover::before { opacity: 1; }
+  .card.accent::before { background: var(--accent); }
+  .card.green::before { background: var(--green); }
+  .card.blue::before { background: var(--blue); }
+  .card.yellow::before { background: var(--yellow); }
+  .card.orange::before { background: var(--orange); }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .card-route {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .card-code {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .urgency-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  .badge-hot { background: rgba(255,77,109,0.2); color: var(--accent); }
+  .badge-good { background: rgba(0,229,160,0.15); color: var(--green); }
+  .badge-alert { background: rgba(255,214,10,0.15); color: var(--yellow); }
+  .badge-new { background: rgba(76,201,240,0.15); color: var(--blue); }
+
+  .card-prices {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .price-main {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
+  }
+
+  .price-old { font-size: 14px; color: var(--muted); text-decoration: line-through; }
+
+  .price-discount {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(0,229,160,0.15);
+    color: var(--green);
+  }
+
+  .card-meta { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .card-airline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .airline-logo {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    object-fit: contain;
+    background: white;
+    padding: 2px;
+  }
+
+  .card-cta {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .card-cta:hover { background: var(--accent); border-color: var(--accent); color: white; }
+
+  /* LOADING */
+  .loading {
+    text-align: center;
+    padding: 60px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .spinner {
+    width: 32px; height: 32px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* SUBSCRIBE */
+  .subscribe-section {
+    margin: 0 40px 60px;
+    background: linear-gradient(135deg, rgba(30,111,240,0.06), rgba(26,163,212,0.04));
+    border: 1px solid rgba(30,111,240,0.2);
+    border-radius: 20px;
+    padding: 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .subscribe-section::before {
+    content: '✈';
+    position: absolute;
+    font-size: 200px;
+    opacity: 0.03;
+    top: -40px; right: -20px;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .subscribe-section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+  }
+
+  .subscribe-section p { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
+
+  .subscribe-form {
+    display: flex;
+    gap: 10px;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  .subscribe-input {
+    flex: 1;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .subscribe-input:focus { border-color: var(--accent); }
+  .subscribe-input::placeholder { color: var(--muted); }
+
+  .subscribe-submit {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .subscribe-submit:hover { background: #ff2d52; transform: translateY(-1px); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,26,46,0.6);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    max-width: 480px;
+    width: 90%;
+    position: relative;
+    animation: modalIn 0.3s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  @keyframes modalIn {
+    from { opacity:0; transform: scale(0.95) translateY(10px); }
+    to { opacity:1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: var(--border);
+    border: none;
+    color: var(--muted);
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+  .modal-price-big {
+    font-family: 'Syne', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--green);
+    letter-spacing: -2px;
+    margin-bottom: 20px;
+  }
+
+  .modal-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .modal-detail {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+  }
+
+  .modal-detail-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .modal-detail-value { font-size: 14px; font-weight: 600; }
+
+  .modal-note {
+    background: rgba(240,180,0,0.08);
+    border: 1px solid rgba(240,180,0,0.25);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 13px;
+    color: #b38600;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  .modal-cta {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .modal-cta:hover { background: #1558d6; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  /* EMPTY STATE */
+  .empty {
+    text-align: center;
+    padding: 60px;
+    color: var(--muted);
+  }
+
+  .empty-icon { font-size: 48px; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">Go<span>low</span> <span class="nav-badge">CANLI</span></a>
+  <a href="https://golow.substack.com" target="_blank" class="subscribe-btn">Bildirim Al</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-tag">
+    <span class="dot"></span>
+    Anlık güncelleniyor
+  </div>
+  <h1>Kaçırmadan önce<br><em>haber veririz.</em></h1>
+  <p>İstanbul çıkışlı en ucuz uçuş fırsatları. Fiyat düştüğünde ilk sen öğren.</p>
+
+  <div class="ticker-wrap">
+    <div class="ticker-header">
+      <span class="ticker-title">Aktif Fırsatlar</span>
+      <span class="ticker-live"><span class="dot"></span> Canlı</span>
+    </div>
+    <div class="ticker-scroll">
+      <div class="ticker-track" id="tickerTrack">
+        <div class="ticker-item">
+          <span class="ticker-route">Yükleniyor...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-header">
+    <h2 class="section-title">🔥 Aktif Fırsatlar</h2>
+    <span class="section-count" id="dealCount">Yükleniyor...</span>
+  </div>
+
+  <div class="filters">
+    <button class="filter active" onclick="filterCards('all', this)">Tümü</button>
+    <button class="filter" onclick="filterCards('hot', this)">🔥 Hata Fiyatı</button>
+    <button class="filter" onclick="filterCards('good', this)">✅ Çok İyi</button>
+    <button class="filter" onclick="filterCards('new', this)">🆕 Yeni</button>
+    <button class="filter" onclick="filterCards('alert', this)">⚡ Fırsat</button>
+  </div>
+
+  <div id="cardsContainer">
+    <div class="loading">
+      <div class="spinner"></div>
+      Fırsatlar yükleniyor...
+    </div>
+  </div>
+</section>
+
+<div class="subscribe-section">
+  <h2>Fırsatı kaçırma.</h2>
+  <p>Yeni fırsat çıktığında sana haber verelim. Ücretsiz, istediğinde çıkarsın.</p>
+  <div class="subscribe-form">
+    <input type="email" class="subscribe-input" placeholder="e-posta adresin" id="emailInput" />
+    <button class="subscribe-submit" onclick="handleSubscribe()">Bildir Bana →</button>
+  </div>
+</div>
+
+<footer>
+  <span>© 2025 Golow — İstanbul çıkışlı uçuş fırsatları</span>
+  <span>@golowtr</span>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 id="modalTitle">—</h3>
+    <div class="modal-sub" id="modalSub">—</div>
+    <div class="modal-price-big" id="modalPrice">—</div>
+    <div class="modal-details">
+      <div class="modal-detail">
+        <div class="modal-detail-label">Normal Fiyat</div>
+        <div class="modal-detail-value" id="modalNormal">—</div>
+      </div>
+      <div class="modal-detail">
+        <div class="modal-detail-label">İndirim</div>
+        <div class="modal-detail-value" id="modalDiscount">—</div>
+      </div>
+      <div class="modal-detail">
+        <div class="modal-detail-label">Gidiş</div>
+        <div class="modal-detail-value" id="modalDep">—</div>
+      </div>
+      <div class="modal-detail">
+        <div class="modal-detail-label">Dönüş</div>
+        <div class="modal-detail-value" id="modalRet">—</div>
+      </div>
+      <div class="modal-detail">
+        <div class="modal-detail-label">Havayolu</div>
+        <div class="modal-detail-value" id="modalAirline">—</div>
+      </div>
+      <div class="modal-detail">
+        <div class="modal-detail-label">Son Alım</div>
+        <div class="modal-detail-value" id="modalDeadline">—</div>
+      </div>
+    </div>
+    <div class="modal-note" id="modalNote"></div>
+    <button class="modal-cta" id="modalCta" onclick="openFlights()">Google Flights'ta Gör →</button>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://resssdiuypnweoaxpkoq.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_hCfDQcIvplQYApiHd4VX5A_U-wWT9Qr';
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let allFlights = [];
+  let currentFlight = null;
+
+  const colorMap = {
+    hot: 'accent',
+    good: 'green',
+    new: 'blue',
+    alert: 'yellow'
+  };
+
+  const badgeMap = {
+    hot: '<span class="urgency-badge badge-hot">🔥 HATA</span>',
+    good: '<span class="urgency-badge badge-good">✅ ÇOK İYİ</span>',
+    new: '<span class="urgency-badge badge-new">🆕 YENİ</span>',
+    alert: '<span class="urgency-badge badge-alert">⚡ FIRSAT</span>'
+  };
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function calcDiscount(price, normal) {
+    if (!price || !normal || normal === 0) return null;
+    return Math.round((1 - price / normal) * 100);
+  }
+
+  function formatPrice(p) {
+    if (!p) return '—';
+    return '₺' + Number(p).toLocaleString('tr-TR');
+  }
+
+  function buildTickerHTML(flights) {
+    if (!flights.length) return '<div class="ticker-item"><span>Henüz fırsat eklenmedi</span></div>';
+    const items = flights.map(f => {
+      const disc = calcDiscount(f.price, f.normal_price);
+      const pctClass = f.urgency === 'hot' ? 'hot' : '';
+      return `
+        <div class="ticker-item">
+          <span class="ticker-route">${f.from_code || 'IST'} → ${f.to_code || f.to_city}</span>
+          <span class="ticker-price">${formatPrice(f.price)}</span>
+          ${disc ? `<span class="ticker-pct ${pctClass}">▼ %${disc}</span>` : ''}
+        </div>`;
+    }).join('');
+    return items + items; // duplicate for seamless loop
+  }
+
+  function buildCardHTML(f) {
+    const disc = calcDiscount(f.price, f.normal_price);
+    const color = colorMap[f.urgency] || 'green';
+    const badge = badgeMap[f.urgency] || badgeMap['good'];
+    const priceColor = {
+      hot: 'var(--accent)', good: 'var(--green)',
+      new: 'var(--blue)', alert: 'var(--yellow)'
+    }[f.urgency] || 'var(--green)';
+
+    const logo = f.airlines?.logo_url
+      ? `<img src="${f.airlines.logo_url}" class="airline-logo" alt="${f.airlines.name}" onerror="this.style.display='none'">`
+      : '✈️';
+
+    return `
+      <div class="card ${color}" data-urgency="${f.urgency}" onclick="openModal(${f.id})">
+        <div class="card-top">
+          <div>
+            <div class="card-route">${f.from_city} → ${f.to_city}</div>
+            <div class="card-code">${f.from_code || 'IST'} → ${f.to_code || ''}</div>
+          </div>
+          ${badge}
+        </div>
+        <div class="card-prices">
+          <span class="price-main" style="color:${priceColor}">${formatPrice(f.price)}</span>
+          ${f.normal_price ? `<span class="price-old">${formatPrice(f.normal_price)}</span>` : ''}
+          ${disc ? `<span class="price-discount">-%${disc}</span>` : ''}
+        </div>
+        <div class="card-meta">
+          ${f.departure_date ? `<span class="meta-item">📅 ${formatDate(f.departure_date)}</span>` : ''}
+          ${f.booking_deadline ? `<span class="meta-item">⏱️ ${formatDate(f.booking_deadline)}'e kadar</span>` : ''}
+          <span class="meta-item">✈️ ${f.trip_type === 'round_trip' ? 'Gidiş-dönüş' : 'Tek yön'}</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-airline">${logo} ${f.airlines?.name || f.airline_id || ''}</div>
+          <button class="card-cta">İncele →</button>
+        </div>
+      </div>`;
+  }
+
+  function renderCards(flights) {
+    const container = document.getElementById('cardsContainer');
+    document.getElementById('dealCount').textContent = `${flights.length} fırsat bulundu`;
+
+    if (!flights.length) {
+      container.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">✈️</div>
+          <p>Henüz fırsat eklenmedi. Yakında gelecek!</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = `<div class="cards">${flights.map(buildCardHTML).join('')}</div>`;
+  }
+
+  async function loadFlights() {
+    try {
+      const { data, error } = await supabase
+        .from('flights')
+        .select('*, airlines(name, iata_code, logo_url)')
+        .eq('active', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      allFlights = data || [];
+      renderCards(allFlights);
+
+      // Build ticker
+      const ticker = document.getElementById('tickerTrack');
+      ticker.innerHTML = buildTickerHTML(allFlights);
+
+    } catch (err) {
+      console.error(err);
+      document.getElementById('cardsContainer').innerHTML =
+        '<div class="empty"><div class="empty-icon">⚠️</div><p>Fırsatlar yüklenirken hata oluştu.</p></div>';
+    }
+  }
+
+  function filterCards(urgency, btn) {
+    document.querySelectorAll('.filter').forEach(f => f.classList.remove('active'));
+    btn.classList.add('active');
+
+    const filtered = urgency === 'all'
+      ? allFlights
+      : allFlights.filter(f => f.urgency === urgency);
+
+    renderCards(filtered);
+  }
+
+  function openModal(id) {
+    const f = allFlights.find(x => x.id === id);
+    if (!f) return;
+    currentFlight = f;
+
+    const disc = calcDiscount(f.price, f.normal_price);
+    document.getElementById('modalTitle').textContent = `${f.from_city} → ${f.to_city}`;
+    document.getElementById('modalSub').textContent =
+      `${f.from_code || 'IST'} → ${f.to_code || ''} · ${f.trip_type === 'round_trip' ? 'Gidiş-dönüş' : 'Tek yön'}`;
+    document.getElementById('modalPrice').textContent = formatPrice(f.price);
+    document.getElementById('modalNormal').textContent = formatPrice(f.normal_price);
+    document.getElementById('modalDiscount').textContent = disc ? `%${disc}` : '—';
+    document.getElementById('modalDep').textContent = formatDate(f.departure_date);
+    document.getElementById('modalRet').textContent = formatDate(f.return_date);
+    document.getElementById('modalAirline').textContent = f.airlines?.name || '—';
+    document.getElementById('modalDeadline').textContent = formatDate(f.booking_deadline);
+
+    const note = document.getElementById('modalNote');
+    if (f.editor_note) {
+      note.textContent = '✏️ ' + f.editor_note;
+      note.style.display = 'block';
+    } else {
+      note.style.display = 'none';
+    }
+
+    document.getElementById('modal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+  }
+
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modal')) closeModal();
+  }
+
+  function openFlights() {
+    if (!currentFlight) return;
+    const from = currentFlight.from_code || 'IST';
+    const to = currentFlight.to_code || '';
+    window.open(`https://www.google.com/travel/flights?q=Flights+from+${from}+to+${to}`, '_blank');
+  }
+
+  function handleSubscribe() {
+    const input = document.getElementById('emailInput');
+    if (input.value.includes('@')) {
+      window.open('https://golow.substack.com', '_blank');
+      input.value = '';
+      input.placeholder = '✅ Yönlendiriliyorsunuz...';
+      input.style.borderColor = 'var(--green)';
+    } else {
+      input.style.borderColor = 'var(--accent)';
+      input.placeholder = 'Geçerli bir e-posta gir';
+    }
+  }
+
+  loadFlights();
+</script>
+</body>
+</html>
