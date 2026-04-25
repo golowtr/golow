@@ -912,7 +912,22 @@
     if (!currentFlight) return;
     const from = currentFlight.from_code || 'IST';
     const to = currentFlight.to_code || '';
-    window.open(`https://www.google.com/travel/flights?q=Flights+from+${from}+to+${to}`, '_blank');
+    const dep = currentFlight.departure_date || '';
+    const ret = currentFlight.return_date || '';
+    const type = currentFlight.trip_type === 'round_trip' ? '1' : '2';
+
+    // Google Flights deep link with dates
+    let url = `https://www.google.com/travel/flights/search?tfs=CBwQAhoeEgoyMDI1LTAzLTE1agcIARIDSVNUcgcIARIDQU1TGh4SCjIwMjUtMDMtMjJqBwgBEgNBTVNyBwgBEgNJU1Q`;
+
+    // Simpler fallback URL with query params
+    if (dep) {
+      url = `https://www.google.com/travel/flights?q=Flights+from+${from}+to+${to}&date=${dep}`;
+      if (ret) url += `&return=${ret}`;
+    } else {
+      url = `https://www.google.com/travel/flights?q=Flights+from+${from}+to+${to}`;
+    }
+
+    window.open(url, '_blank');
   }
 
   function handleSubscribe() {
