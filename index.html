@@ -955,6 +955,7 @@
   }
 
 
+  function openSkyscanner(id) {
     const f = id ? allFlights.find(x => x.id === id) : currentFlight;
     if (!f) return;
     const from = f.from_code || 'IST';
