@@ -112,11 +112,12 @@
 
   .hero h1 {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(36px, 5vw, 64px);
+    font-size: clamp(32px, 4vw, 56px);
     font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -2px;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
     margin-bottom: 16px;
+    max-width: 600px;
   }
 
   .hero h1 em { font-style: normal; color: var(--accent); }
@@ -723,7 +724,7 @@
 
 <script>
   const SUPABASE_URL = 'https://resssdiuypnweoaxpkoq.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_hCfDQcIvplQYApiHd4VX5A_U-wWT9Qr';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlc3NzZGl1eXBud2VvYXhwa29xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwMzQ4NjMsImV4cCI6MjA5MjYxMDg2M30._WJ6CQrmblfssRl7RKe3YGytRrCHaO-d4MUBI2tR2mQ';
 
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
