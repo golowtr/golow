@@ -742,7 +742,10 @@
       </div>
     </div>
     <div class="modal-note" id="modalNote"></div>
-    <button class="modal-cta" id="modalCta" onclick="openFlights()">✈️ Skyscanner'da Gör</button>
+    <div style="display:flex;gap:10px">
+      <button class="modal-cta" id="modalCta" onclick="openFlights()" style="flex:1">✈️ Skyscanner'da Gör</button>
+      <button class="modal-cta" onclick="openBooking(null)" style="flex:1;background:#003580">🏨 Otel Bul</button>
+    </div>
   </div>
 </div>
 
@@ -836,9 +839,8 @@
           <div class="card-airline">${logo} ${f.airlines?.name || f.airline_id || ''}</div>
           <div style="display:flex;gap:8px">
             <button class="card-cta" onclick="event.stopPropagation();openModal(${f.id})">İncele →</button>
-            <button class="card-sky-btn" onclick="event.stopPropagation();openSkyscanner(${f.id})">
-              ✈️ Skyscanner
-            </button>
+            <button class="card-sky-btn" onclick="event.stopPropagation();openSkyscanner(${f.id})">✈️ Skyscanner</button>
+            <button class="card-sky-btn" style="background:#003580" onclick="event.stopPropagation();openBooking(${f.id})">🏨 Otel</button>
           </div>
         </div>
       </div>`;
@@ -940,7 +942,19 @@
     return `${yy}${mm}${dd}`;
   }
 
-  function openSkyscanner(id) {
+  function openBooking(id) {
+    const f = id ? allFlights.find(x => x.id === id) : currentFlight;
+    if (!f) return;
+    const city = encodeURIComponent(f.to_city || '');
+    const checkin = f.departure_date || '';
+    const checkout = f.return_date || '';
+    let url = `https://www.booking.com/searchresults.tr.html?ss=${city}`;
+    if (checkin) url += `&checkin=${checkin}`;
+    if (checkout) url += `&checkout=${checkout}`;
+    window.open(url, '_blank');
+  }
+
+
     const f = id ? allFlights.find(x => x.id === id) : currentFlight;
     if (!f) return;
     const from = f.from_code || 'IST';
