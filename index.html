@@ -725,7 +725,7 @@
   const SUPABASE_URL = 'https://resssdiuypnweoaxpkoq.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_hCfDQcIvplQYApiHd4VX5A_U-wWT9Qr';
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   let allFlights = [];
   let currentFlight = null;
@@ -832,7 +832,7 @@
 
   async function loadFlights() {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await sb
         .from('flights')
         .select('*, airlines(name, iata_code, logo_url)')
         .eq('active', true)

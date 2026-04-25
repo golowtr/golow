@@ -466,7 +466,7 @@
   const SUPABASE_URL = 'https://resssdiuypnweoaxpkoq.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_hCfDQcIvplQYApiHd4VX5A_U-wWT9Qr';
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // AUTH
   async function login() {
@@ -474,7 +474,7 @@
     const password = document.getElementById('loginPassword').value;
     const err = document.getElementById('loginError');
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await sb.auth.signInWithPassword({ email, password });
 
     if (error) {
       err.textContent = 'Hatalı e-posta veya şifre.';
@@ -484,13 +484,13 @@
   }
 
   async function logout() {
-    await supabase.auth.signOut();
+    await sb.auth.signOut();
     document.getElementById('adminPanel').classList.remove('visible');
     document.getElementById('loginScreen').style.display = 'flex';
   }
 
   async function checkAuth() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await sb.auth.getSession();
     if (session) {
       showAdmin();
     }
@@ -530,7 +530,7 @@
 
   // LOAD
   async function loadFlights() {
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from('flights')
       .select('*')
       .order('created_at', { ascending: false });
@@ -604,9 +604,9 @@
 
     let error;
     if (editId) {
-      ({ error } = await supabase.from('flights').update(payload).eq('id', editId));
+      ({ error } = await sb.from('flights').update(payload).eq('id', editId));
     } else {
-      ({ error } = await supabase.from('flights').insert(payload));
+      ({ error } = await sb.from('flights').insert(payload));
     }
 
     if (error) {
@@ -622,7 +622,7 @@
   let allFlightsData = [];
 
   async function editFlight(id) {
-    const { data } = await supabase.from('flights').select('*').eq('id', id).single();
+    const { data } = await sb.from('flights').select('*').eq('id', id).single();
     if (!data) return;
 
     document.getElementById('editId').value = data.id;
@@ -648,14 +648,14 @@
   // DELETE
   async function deleteFlight(id) {
     if (!confirm('Bu fırsatı silmek istediğine emin misin?')) return;
-    const { error } = await supabase.from('flights').delete().eq('id', id);
+    const { error } = await sb.from('flights').delete().eq('id', id);
     if (error) showToast('Silme hatası', 'error');
     else { showToast('🗑️ Silindi'); loadFlights(); }
   }
 
   // TOGGLE
   async function toggleActive(id, current) {
-    const { error } = await supabase.from('flights').update({ active: !current }).eq('id', id);
+    const { error } = await sb.from('flights').update({ active: !current }).eq('id', id);
     if (error) showToast('Hata', 'error');
     else { showToast(current ? '⏸️ Pasife alındı' : '✅ Aktif edildi'); loadFlights(); }
   }
