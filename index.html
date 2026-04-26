@@ -2,11 +2,32 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Golow — Uçuş Fırsatları</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="theme-color" content="#1e6ff0">
+
+<title>Golow — İstanbul Çıkışlı Ucuz Uçuş Fırsatları</title>
+<meta name="description" content="İstanbul çıkışlı en ucuz uçuş fırsatları. Kaçırmadan önce sana haber veririz. Hata fiyatları, anlık indirimler, dönemsel kampanyalar.">
+<meta name="keywords" content="ucuz uçak bileti, uçuş fırsatları, istanbul uçuş, hata fiyatı, uçak indirim, golow">
+<meta name="author" content="Golow">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Golow — İstanbul Çıkışlı Ucuz Uçuş Fırsatları">
+<meta property="og:description" content="Kaçırmadan önce haber veririz. İstanbul çıkışlı en ucuz uçuş fırsatları.">
+<meta property="og:url" content="https://golow.vercel.app">
+<meta property="og:locale" content="tr_TR">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Golow — Ucuz Uçuş Fırsatları">
+<meta name="twitter:description" content="Kaçırmadan önce haber veririz.">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%9C%88%EF%B8%8F</text></svg>">
+
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=outfit:400,500,600,700,800|inter:400,500,600" rel="stylesheet">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+
 <style>
   :root {
     --bg: #f5f6fa;
@@ -15,6 +36,7 @@
     --text: #1a1a2e;
     --muted: #8890a8;
     --accent: #1e6ff0;
+    --accent-dark: #1558d6;
     --green: #00b87a;
     --yellow: #f0b400;
     --blue: #1aa3d4;
@@ -22,6 +44,7 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
 
   body {
     background: var(--bg);
@@ -34,27 +57,30 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* NAV */
   nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 40px;
+    padding: 16px 24px;
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
-    background: rgba(245,246,250,0.95);
+    background: rgba(245,246,250,0.92);
     backdrop-filter: blur(20px);
     z-index: 100;
+    gap: 16px;
   }
 
   .logo {
     font-family: 'Outfit', sans-serif;
     font-weight: 800;
-    font-size: 26px;
+    font-size: 24px;
     letter-spacing: -1px;
     color: var(--text);
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .logo span { color: var(--accent); }
@@ -62,50 +88,68 @@
   .nav-badge {
     background: var(--accent);
     color: white;
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 9px;
+    font-weight: 700;
     padding: 3px 8px;
     border-radius: 20px;
-    margin-left: 8px;
     animation: pulse 2s infinite;
-    vertical-align: middle;
+    letter-spacing: 0.5px;
   }
 
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.65} }
+
+  .nav-tabs { display: flex; gap: 4px; }
+
+  .nav-tab {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { background: var(--accent); color: white; }
 
   .subscribe-btn {
     background: var(--accent);
     color: white;
     border: none;
-    padding: 10px 22px;
+    padding: 9px 18px;
     border-radius: 8px;
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 14px;
-    font-weight: 500;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
     text-decoration: none;
   }
 
-  .subscribe-btn:hover { background: #1558d6; transform: translateY(-1px); }
+  .subscribe-btn:hover { background: var(--accent-dark); transform: translateY(-1px); }
 
-  /* HERO */
   .hero {
-    padding: 60px 40px 40px;
+    padding: 48px 24px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
   }
 
   .hero-tag {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(0,229,160,0.1);
-    border: 1px solid rgba(0,229,160,0.3);
+    background: rgba(0,184,122,0.1);
+    border: 1px solid rgba(0,184,122,0.25);
     color: var(--green);
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     padding: 6px 14px;
     border-radius: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
 
   .dot {
@@ -117,12 +161,12 @@
 
   .hero h1 {
     font-family: 'Outfit', sans-serif;
-    font-size: clamp(32px, 4vw, 56px);
+    font-size: clamp(32px, 5vw, 56px);
     font-weight: 800;
     line-height: 1.1;
     letter-spacing: -1.5px;
     margin-bottom: 16px;
-    max-width: 600px;
+    max-width: 700px;
   }
 
   .hero h1 em { font-style: normal; color: var(--accent); }
@@ -132,29 +176,27 @@
     font-size: 16px;
     max-width: 480px;
     line-height: 1.6;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
   }
 
-  /* TICKER */
   .ticker-wrap {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 14px;
     overflow: hidden;
-    margin-bottom: 48px;
   }
 
   .ticker-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 20px;
+    padding: 12px 18px;
     border-bottom: 1px solid var(--border);
   }
 
   .ticker-title {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     color: var(--muted);
@@ -166,14 +208,14 @@
     gap: 6px;
     font-size: 11px;
     color: var(--green);
-    font-weight: 500;
+    font-weight: 600;
   }
 
-  .ticker-scroll { overflow: hidden; padding: 14px 0; }
+  .ticker-scroll { overflow: hidden; padding: 12px 0; }
 
   .ticker-track {
     display: flex;
-    animation: ticker 30s linear infinite;
+    animation: ticker 35s linear infinite;
     white-space: nowrap;
   }
 
@@ -188,7 +230,7 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    padding: 0 24px;
+    padding: 0 22px;
     border-right: 1px solid var(--border);
     font-size: 13px;
   }
@@ -199,53 +241,62 @@
     font-size: 11px;
     padding: 2px 6px;
     border-radius: 4px;
-    font-weight: 600;
-    background: rgba(0,229,160,0.15);
+    font-weight: 700;
+    background: rgba(0,184,122,0.12);
     color: var(--green);
   }
-  .ticker-pct.hot { background: rgba(255,77,109,0.15); color: var(--accent); }
+  .ticker-pct.hot { background: rgba(232,93,32,0.12); color: var(--orange); }
 
-  /* SECTION */
-  .section { padding: 0 40px 60px; }
+  .section {
+    padding: 32px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 
   .section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
   }
 
   .section-title {
     font-family: 'Outfit', sans-serif;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 700;
     letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
-  .section-count { font-size: 13px; color: var(--muted); }
+  .section-count { font-size: 13px; color: var(--muted); font-weight: 500; }
 
-  /* FILTERS */
-  .filters { display: flex; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
+  .filters { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
 
   .filter {
     background: var(--surface);
     border: 1px solid var(--border);
     color: var(--muted);
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: 100px;
     font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: inherit;
   }
 
-  .filter:hover, .filter.active {
+  .filter:hover { border-color: var(--accent); color: var(--text); }
+  .filter.active {
     background: var(--accent);
     border-color: var(--accent);
     color: white;
+    font-weight: 600;
   }
 
-  /* CARDS */
   .cards {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -256,8 +307,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 24px;
-    cursor: pointer;
+    padding: 22px;
     transition: all 0.25s;
     position: relative;
     overflow: hidden;
@@ -273,13 +323,12 @@
   }
 
   .card:hover {
-    border-color: rgba(30,111,240,0.2);
+    border-color: rgba(30,111,240,0.25);
     transform: translateY(-3px);
-    box-shadow: 0 20px 40px rgba(30,111,240,0.08);
+    box-shadow: 0 18px 36px rgba(30,111,240,0.08);
   }
 
   .card:hover::before { opacity: 1; }
-  .card.accent::before { background: var(--accent); }
   .card.green::before { background: var(--green); }
   .card.blue::before { background: var(--blue); }
   .card.yellow::before { background: var(--yellow); }
@@ -289,139 +338,155 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 18px;
   }
 
   .card-route {
     font-family: 'Outfit', sans-serif;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
-    letter-spacing: -0.5px;
-    white-space: nowrap;
+    letter-spacing: -0.3px;
+    line-height: 1.25;
   }
 
   .card-code {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
-    margin-top: 2px;
+    margin-top: 4px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
   }
 
   .urgency-badge {
     font-size: 10px;
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
     padding: 4px 10px;
-    border-radius: 6px;
+    border-radius: 100px;
     white-space: nowrap;
+    flex-shrink: 0;
   }
 
-  .badge-hot { background: rgba(255,77,109,0.2); color: var(--accent); }
-  .badge-good { background: rgba(0,229,160,0.15); color: var(--green); }
-  .badge-alert { background: rgba(255,214,10,0.15); color: var(--yellow); }
-  .badge-new { background: rgba(76,201,240,0.15); color: var(--blue); }
+  .badge-hot { background: rgba(232,93,32,0.15); color: var(--orange); }
+  .badge-good { background: rgba(0,184,122,0.12); color: var(--green); }
+  .badge-alert { background: rgba(240,180,0,0.15); color: var(--yellow); }
+  .badge-new { background: rgba(26,163,212,0.12); color: var(--blue); }
 
   .card-prices {
     display: flex;
     align-items: baseline;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: 10px;
+    margin-bottom: 14px;
     flex-wrap: wrap;
   }
 
   .price-main {
     font-family: 'Outfit', sans-serif;
-    font-size: 32px;
+    font-size: 30px;
     font-weight: 800;
     letter-spacing: -1px;
+    line-height: 1;
   }
 
-  .price-old { font-size: 14px; color: var(--muted); text-decoration: line-through; }
+  .price-old { font-size: 13px; color: var(--muted); text-decoration: line-through; }
 
   .price-discount {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     padding: 3px 8px;
     border-radius: 6px;
-    background: rgba(0,229,160,0.15);
+    background: rgba(0,184,122,0.12);
     color: var(--green);
   }
 
-  .card-meta { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-
-  .meta-item {
+  .card-meta {
     display: flex;
-    align-items: center;
-    gap: 5px;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
     font-size: 12px;
     color: var(--muted);
+  }
+
+  .card-deadline {
+    font-size: 11px;
+    color: var(--orange);
+    font-weight: 600;
+    background: rgba(232,93,32,0.08);
+    padding: 6px 10px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
   .card-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 16px;
+    padding-top: 14px;
     border-top: 1px solid var(--border);
+    gap: 8px;
+    flex-wrap: wrap;
   }
 
   .card-airline {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     font-size: 12px;
     color: var(--muted);
+    font-weight: 500;
   }
 
-  .airline-logo {
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-    object-fit: contain;
-    background: white;
-    padding: 2px;
+  .card-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
   }
 
-  .card-cta {
+  .btn-icon {
     background: transparent;
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 8px 16px;
+    width: 32px;
+    height: 32px;
     border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
     cursor: pointer;
-    font-family: 'Inter', system-ui, sans-serif;
     transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
   }
 
-  .card-cta:hover { background: var(--accent); border-color: var(--accent); color: white; }
+  .btn-icon:hover { background: var(--accent); border-color: var(--accent); color: white; }
 
-  .card-sky-btn {
-    background: #0770e3;
+  .btn-pill {
+    background: var(--accent);
     border: none;
     color: white;
-    padding: 8px 12px;
+    padding: 7px 13px;
     border-radius: 8px;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: inherit;
     transition: all 0.2s;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 5px;
   }
 
-  .card-sky-btn:hover { background: #0558b0; transform: translateY(-1px); }
+  .btn-pill:hover { background: var(--accent-dark); }
+  .btn-pill.dark { background: #003580; }
+  .btn-pill.dark:hover { background: #002857; }
 
-  /* LOADING */
-  .loading {
-    text-align: center;
-    padding: 60px;
-    color: var(--muted);
-    font-size: 14px;
-  }
+  .loading { text-align: center; padding: 60px; color: var(--muted); font-size: 14px; }
 
   .spinner {
     width: 32px; height: 32px;
@@ -434,23 +499,82 @@
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* SUBSCRIBE */
+  .empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+  }
+
+  .empty-icon { font-size: 56px; margin-bottom: 16px; opacity: 0.6; }
+  .empty h3 {
+    font-family: 'Outfit', sans-serif;
+    color: var(--text);
+    margin-bottom: 8px;
+    font-size: 20px;
+  }
+  .empty p { font-size: 14px; max-width: 380px; margin: 0 auto; }
+
+  .campaign-card {
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: white;
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .campaign-card::before {
+    content: '🔥';
+    position: absolute;
+    font-size: 120px;
+    opacity: 0.08;
+    top: -10px; right: -10px;
+    line-height: 1;
+  }
+
+  .campaign-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .campaign-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+
+  .campaign-desc { font-size: 14px; opacity: 0.92; margin-bottom: 14px; }
+  .campaign-meta { display: flex; gap: 16px; font-size: 12px; opacity: 0.9; flex-wrap: wrap; }
+
   .subscribe-section {
-    margin: 0 40px 60px;
+    margin: 32px auto;
     background: linear-gradient(135deg, rgba(30,111,240,0.06), rgba(26,163,212,0.04));
     border: 1px solid rgba(30,111,240,0.2);
     border-radius: 20px;
-    padding: 48px;
+    padding: 40px 24px;
     text-align: center;
     position: relative;
     overflow: hidden;
+    max-width: 1152px;
   }
 
   .subscribe-section::before {
     content: '✈';
     position: absolute;
     font-size: 200px;
-    opacity: 0.03;
+    opacity: 0.04;
     top: -40px; right: -20px;
     line-height: 1;
     pointer-events: none;
@@ -458,54 +582,54 @@
 
   .subscribe-section h2 {
     font-family: 'Outfit', sans-serif;
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 800;
     letter-spacing: -1px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
 
-  .subscribe-section p { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
+  .subscribe-section p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
 
   .subscribe-form {
     display: flex;
-    gap: 10px;
-    max-width: 440px;
+    gap: 8px;
+    max-width: 420px;
     margin: 0 auto;
+    flex-wrap: wrap;
   }
 
   .subscribe-input {
     flex: 1;
-    background: rgba(255,255,255,0.9);
+    min-width: 200px;
+    background: white;
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 14px 18px;
+    padding: 13px 16px;
     border-radius: 10px;
     font-size: 14px;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: inherit;
     outline: none;
     transition: border-color 0.2s;
   }
 
   .subscribe-input:focus { border-color: var(--accent); }
-  .subscribe-input::placeholder { color: var(--muted); }
 
   .subscribe-submit {
     background: var(--accent);
     color: white;
     border: none;
-    padding: 14px 24px;
+    padding: 13px 22px;
     border-radius: 10px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    font-family: 'Inter', system-ui, sans-serif;
-    white-space: nowrap;
+    font-family: inherit;
     transition: all 0.2s;
+    white-space: nowrap;
   }
 
-  .subscribe-submit:hover { background: #ff2d52; transform: translateY(-1px); }
+  .subscribe-submit:hover { background: var(--accent-dark); }
 
-  /* MODAL */
   .modal-overlay {
     display: none;
     position: fixed;
@@ -515,17 +639,17 @@
     z-index: 200;
     align-items: center;
     justify-content: center;
+    padding: 20px;
   }
 
   .modal-overlay.open { display: flex; }
 
   .modal {
     background: var(--surface);
-    border: 1px solid var(--border);
     border-radius: 20px;
-    padding: 36px;
+    padding: 32px;
     max-width: 480px;
-    width: 90%;
+    width: 100%;
     position: relative;
     animation: modalIn 0.3s ease;
     max-height: 90vh;
@@ -533,55 +657,59 @@
   }
 
   @keyframes modalIn {
-    from { opacity:0; transform: scale(0.95) translateY(10px); }
+    from { opacity:0; transform: scale(0.96) translateY(8px); }
     to { opacity:1; transform: scale(1) translateY(0); }
   }
 
   .modal-close {
     position: absolute;
-    top: 16px; right: 16px;
-    background: var(--border);
+    top: 14px; right: 14px;
+    background: var(--bg);
     border: none;
     color: var(--muted);
-    width: 28px; height: 28px;
+    width: 30px; height: 30px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s;
   }
+
+  .modal-close:hover { background: var(--border); color: var(--text); }
 
   .modal h3 {
     font-family: 'Outfit', sans-serif;
     font-size: 24px;
     font-weight: 800;
     margin-bottom: 4px;
+    letter-spacing: -0.5px;
   }
 
   .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
 
   .modal-price-big {
     font-family: 'Outfit', sans-serif;
-    font-size: 48px;
+    font-size: 44px;
     font-weight: 800;
     color: var(--green);
     letter-spacing: -2px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+    line-height: 1;
   }
 
   .modal-details {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 8px;
+    margin-bottom: 18px;
   }
 
   .modal-detail {
     background: var(--bg);
-    border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 12px;
+    padding: 12px 14px;
   }
 
   .modal-detail-label {
@@ -590,63 +718,124 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 4px;
+    font-weight: 600;
   }
 
-  .modal-detail-value { font-size: 14px; font-weight: 600; }
+  .modal-detail-value { font-size: 13px; font-weight: 600; }
 
   .modal-note {
     background: rgba(240,180,0,0.08);
-    border: 1px solid rgba(240,180,0,0.25);
+    border: 1px solid rgba(240,180,0,0.2);
     border-radius: 10px;
     padding: 14px;
     font-size: 13px;
     color: #b38600;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
     line-height: 1.6;
   }
 
-  .modal-cta {
-    width: 100%;
-    background: var(--accent);
-    color: white;
-    border: none;
-    padding: 16px;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'Inter', system-ui, sans-serif;
-    transition: all 0.2s;
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
   }
 
-  .modal-cta:hover { background: #1558d6; }
+  .modal-actions .btn-pill { flex: 1; justify-content: center; padding: 14px; font-size: 14px; }
 
-  /* FOOTER */
+  .modal-share {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .countdown {
+    background: rgba(232,93,32,0.08);
+    border: 1px solid rgba(232,93,32,0.2);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  .countdown-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .countdown-value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--orange);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--text);
+    color: white;
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 999;
+    opacity: 0;
+    transition: all 0.3s;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
   footer {
     border-top: 1px solid var(--border);
-    padding: 24px 40px;
+    padding: 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     color: var(--muted);
-    font-size: 13px;
+    font-size: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: 1200px;
+    margin: 0 auto;
   }
 
-  /* EMPTY STATE */
-  .empty {
-    text-align: center;
-    padding: 60px;
-    color: var(--muted);
+  footer a { color: inherit; }
+
+  @media (max-width: 640px) {
+    nav { padding: 14px 16px; gap: 8px; }
+    .nav-tabs { display: none; }
+    .hero { padding: 32px 16px 24px; }
+    .hero h1 { font-size: 32px; }
+    .section { padding: 24px 16px; }
+    .subscribe-section { margin: 24px 16px; padding: 28px 20px; }
+    .modal { padding: 24px; }
+    .modal-price-big { font-size: 36px; }
+    .ticker-item { padding: 0 16px; gap: 8px; font-size: 12px; }
+    .card { padding: 18px; }
+    .card-actions { width: 100%; justify-content: flex-end; }
   }
 
-  .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
 <nav>
   <a href="/" class="logo">Go<span>low</span> <span class="nav-badge">CANLI</span></a>
-  <a href="https://golow.substack.com" target="_blank" class="subscribe-btn">Bildirim Al</a>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('flights', this)">✈️ Uçuşlar</button>
+    <button class="nav-tab" onclick="switchTab('campaigns', this)">🔥 Kampanyalar</button>
+  </div>
+  <a href="#subscribe" class="subscribe-btn">Bildirim Al</a>
 </nav>
 
 <section class="hero">
@@ -664,15 +853,13 @@
     </div>
     <div class="ticker-scroll">
       <div class="ticker-track" id="tickerTrack">
-        <div class="ticker-item">
-          <span class="ticker-route">Yükleniyor...</span>
-        </div>
+        <div class="ticker-item"><span class="ticker-route">Yükleniyor...</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section">
+<section class="section" id="flightsSection">
   <div class="section-header">
     <h2 class="section-title">🔥 Aktif Fırsatlar</h2>
     <span class="section-count" id="dealCount">Yükleniyor...</span>
@@ -694,27 +881,40 @@
   </div>
 </section>
 
-<div class="subscribe-section">
+<section class="section hidden" id="campaignsSection">
+  <div class="section-header">
+    <h2 class="section-title">🔥 Aktif Kampanyalar</h2>
+    <span class="section-count" id="campaignCount">Yükleniyor...</span>
+  </div>
+  <div id="campaignsContainer">
+    <div class="loading">
+      <div class="spinner"></div>
+      Kampanyalar yükleniyor...
+    </div>
+  </div>
+</section>
+
+<div class="subscribe-section" id="subscribe">
   <h2>Fırsatı kaçırma.</h2>
   <p>Yeni fırsat çıktığında sana haber verelim. Ücretsiz, istediğinde çıkarsın.</p>
   <div class="subscribe-form">
     <input type="email" class="subscribe-input" placeholder="e-posta adresin" id="emailInput" />
-    <button class="subscribe-submit" onclick="handleSubscribe()">Bildir Bana →</button>
+    <button class="subscribe-submit" onclick="handleSubscribe()">Bildir Bana</button>
   </div>
 </div>
 
 <footer>
   <span>© 2025 Golow — İstanbul çıkışlı uçuş fırsatları</span>
-  <span>@golowtr</span>
+  <span>📸 <a href="https://instagram.com/golowtr" target="_blank">@golowtr</a></span>
 </footer>
 
-<!-- MODAL -->
 <div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
     <h3 id="modalTitle">—</h3>
     <div class="modal-sub" id="modalSub">—</div>
     <div class="modal-price-big" id="modalPrice">—</div>
+    <div id="modalCountdown"></div>
     <div class="modal-details">
       <div class="modal-detail">
         <div class="modal-detail-label">Normal Fiyat</div>
@@ -741,13 +941,20 @@
         <div class="modal-detail-value" id="modalDeadline">—</div>
       </div>
     </div>
-    <div class="modal-note" id="modalNote"></div>
-    <div style="display:flex;gap:10px">
-      <button class="modal-cta" id="modalCta" onclick="openFlights()" style="flex:1">✈️ Skyscanner'da Gör</button>
-      <button class="modal-cta" onclick="openBooking(null)" style="flex:1;background:#003580">🏨 Otel Bul</button>
+    <div class="modal-note hidden" id="modalNote"></div>
+    <div class="modal-actions">
+      <button class="btn-pill" onclick="openSkyscanner(currentFlight?.id)">✈️ Skyscanner</button>
+      <button class="btn-pill dark" onclick="openBooking(currentFlight?.id)">🏨 Otel Bul</button>
+    </div>
+    <div class="modal-share">
+      <button class="btn-icon" onclick="shareFlight('whatsapp')" title="WhatsApp">💬</button>
+      <button class="btn-icon" onclick="shareFlight('twitter')" title="Twitter">𝕏</button>
+      <button class="btn-icon" onclick="shareFlight('copy')" title="Linki Kopyala">🔗</button>
     </div>
   </div>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script>
   const SUPABASE_URL = 'https://resssdiuypnweoaxpkoq.supabase.co';
@@ -757,16 +964,11 @@
 
   let allFlights = [];
   let currentFlight = null;
+  let countdownInterval = null;
 
-  const colorMap = {
-    hot: 'accent',
-    good: 'green',
-    new: 'blue',
-    alert: 'yellow'
-  };
-
+  const colorMap = { hot: 'orange', good: 'green', new: 'blue', alert: 'yellow' };
   const badgeMap = {
-    hot: '<span class="urgency-badge badge-hot">🔥 HATA</span>',
+    hot: '<span class="urgency-badge badge-hot">🔥 HATA FİYATI</span>',
     good: '<span class="urgency-badge badge-good">✅ ÇOK İYİ</span>',
     new: '<span class="urgency-badge badge-new">🆕 YENİ</span>',
     alert: '<span class="urgency-badge badge-alert">⚡ FIRSAT</span>'
@@ -774,8 +976,12 @@
 
   function formatDate(dateStr) {
     if (!dateStr) return '—';
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+    return new Date(dateStr).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function formatDateShort(dateStr) {
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
   }
 
   function calcDiscount(price, normal) {
@@ -786,6 +992,40 @@
   function formatPrice(p) {
     if (!p) return '—';
     return '₺' + Number(p).toLocaleString('tr-TR');
+  }
+
+  function toSkyDate(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    const yy = String(d.getFullYear()).slice(2);
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yy}${mm}${dd}`;
+  }
+
+  function timeUntil(dateStr) {
+    if (!dateStr) return null;
+    const target = new Date(dateStr).setHours(23, 59, 59);
+    const diff = target - Date.now();
+    if (diff < 0) return null;
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    if (days > 0) return `${days} gün ${hours} saat`;
+    const mins = Math.floor((diff % 3600000) / 60000);
+    return `${hours} saat ${mins} dk`;
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  async function trackClick(flightId, destination, platform = 'other') {
+    try {
+      await sb.from('clicks').insert({ flight_id: flightId, destination, platform });
+    } catch (e) {}
   }
 
   function buildTickerHTML(flights) {
@@ -800,7 +1040,7 @@
           ${disc ? `<span class="ticker-pct ${pctClass}">▼ %${disc}</span>` : ''}
         </div>`;
     }).join('');
-    return items + items; // duplicate for seamless loop
+    return items + items;
   }
 
   function buildCardHTML(f) {
@@ -808,16 +1048,18 @@
     const color = colorMap[f.urgency] || 'green';
     const badge = badgeMap[f.urgency] || badgeMap['good'];
     const priceColor = {
-      hot: 'var(--accent)', good: 'var(--green)',
+      hot: 'var(--orange)', good: 'var(--green)',
       new: 'var(--blue)', alert: 'var(--yellow)'
     }[f.urgency] || 'var(--green)';
 
     const logo = f.airlines?.logo_url
-      ? `<img src="${f.airlines.logo_url}" class="airline-logo" alt="${f.airlines.name}" onerror="this.style.display='none'">`
+      ? `<img src="${f.airlines.logo_url}" style="width:20px;height:20px;border-radius:4px;object-fit:contain" alt="${f.airlines.name}" onerror="this.style.display='none'">`
       : '✈️';
 
+    const deadlineText = f.booking_deadline ? timeUntil(f.booking_deadline) : null;
+
     return `
-      <div class="card ${color}" data-urgency="${f.urgency}" onclick="openModal(${f.id})">
+      <div class="card ${color}" data-urgency="${f.urgency}">
         <div class="card-top">
           <div>
             <div class="card-route">${f.from_city} → ${f.to_city}</div>
@@ -830,21 +1072,20 @@
           ${f.normal_price ? `<span class="price-old">${formatPrice(f.normal_price)}</span>` : ''}
           ${disc ? `<span class="price-discount">-%${disc}</span>` : ''}
         </div>
+        ${deadlineText ? `<div class="card-deadline">⏱️ Son ${deadlineText} kaldı</div>` : ''}
         <div class="card-meta">
           ${f.departure_date && f.return_date
-            ? `<span class="meta-item">📅 ${formatDate(f.departure_date)} – ${formatDate(f.return_date)}</span>`
-            : f.departure_date
-            ? `<span class="meta-item">📅 ${formatDate(f.departure_date)}</span>`
-            : ''}
-          ${f.booking_deadline ? `<span class="meta-item">⏱️ ${formatDate(f.booking_deadline)}'e kadar</span>` : ''}
-          <span class="meta-item">${f.trip_type === 'round_trip' ? '🔄 Gidiş-dönüş' : '➡️ Tek yön'}</span>
+            ? `<span>📅 ${formatDateShort(f.departure_date)} – ${formatDateShort(f.return_date)}</span>`
+            : f.departure_date ? `<span>📅 ${formatDateShort(f.departure_date)}</span>` : ''}
+          <span>${f.trip_type === 'round_trip' ? '🔄 Gidiş-dönüş' : '➡️ Tek yön'}</span>
         </div>
         <div class="card-footer">
-          <div class="card-airline">${logo} ${f.airlines?.name || f.airline_id || ''}</div>
-          <div style="display:flex;gap:8px">
-            <button class="card-cta" onclick="event.stopPropagation();openModal(${f.id})">İncele →</button>
-            <button class="card-sky-btn" onclick="event.stopPropagation();openSkyscanner(${f.id})">✈️ Skyscanner</button>
-            <button class="card-sky-btn" style="background:#003580" onclick="event.stopPropagation();openBooking(${f.id})">🏨 Otel</button>
+          <div class="card-airline">${logo} ${f.airlines?.name || ''}</div>
+          <div class="card-actions">
+            <button class="btn-icon" onclick="openModal(${f.id})" title="Detaylar">👁️</button>
+            <button class="btn-icon" onclick="shareFlightCard(${f.id})" title="Paylaş">↗️</button>
+            <button class="btn-pill" onclick="openSkyscanner(${f.id})">✈️</button>
+            <button class="btn-pill dark" onclick="openBooking(${f.id})">🏨</button>
           </div>
         </div>
       </div>`;
@@ -852,18 +1093,65 @@
 
   function renderCards(flights) {
     const container = document.getElementById('cardsContainer');
-    document.getElementById('dealCount').textContent = `${flights.length} fırsat bulundu`;
+    document.getElementById('dealCount').textContent = `${flights.length} fırsat`;
 
     if (!flights.length) {
       container.innerHTML = `
         <div class="empty">
           <div class="empty-icon">✈️</div>
-          <p>Henüz fırsat eklenmedi. Yakında gelecek!</p>
+          <h3>Şu an aktif fırsat yok</h3>
+          <p>Yeni fırsatlar eklendiğinde anında haber vermek için bültenimize abone ol.</p>
         </div>`;
       return;
     }
 
     container.innerHTML = `<div class="cards">${flights.map(buildCardHTML).join('')}</div>`;
+  }
+
+  async function loadCampaigns() {
+    try {
+      const { data, error } = await sb
+        .from('campaign')
+        .select('*, airlines(name, logo_url)')
+        .eq('active', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const campaigns = data || [];
+      const container = document.getElementById('campaignsContainer');
+      document.getElementById('campaignCount').textContent = `${campaigns.length} kampanya`;
+
+      if (!campaigns.length) {
+        container.innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">🔥</div>
+            <h3>Şu an aktif kampanya yok</h3>
+            <p>Havayolu kampanyaları eklenince burada listelenecek.</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = campaigns.map(c => {
+        const discount = c.discount_type === 'ratio' ? `%${c.discount_value}` : `${c.discount_value}₺`;
+        return `
+          <div class="campaign-card">
+            <div class="campaign-tag">🔥 KAMPANYA</div>
+            <div class="campaign-title">${c.title || 'Kampanya'}</div>
+            <div class="campaign-desc">${c.description || ''}</div>
+            <div class="campaign-meta">
+              ${c.discount_value ? `<span>💰 ${discount} indirim</span>` : ''}
+              ${c.travel_start ? `<span>✈️ ${formatDateShort(c.travel_start)}–${formatDateShort(c.travel_end)}</span>` : ''}
+              ${c.sale_end ? `<span>⏱️ ${formatDateShort(c.sale_end)}'e kadar</span>` : ''}
+            </div>
+            ${c.url ? `<button class="btn-pill" style="background:white;color:var(--accent);margin-top:14px" onclick="window.open('${c.url}','_blank')">Kampanyaya Git →</button>` : ''}
+          </div>`;
+      }).join('');
+    } catch (err) {
+      console.error(err);
+      document.getElementById('campaignsContainer').innerHTML =
+        '<div class="empty"><div class="empty-icon">⚠️</div><h3>Hata</h3><p>Kampanyalar yüklenemedi.</p></div>';
+    }
   }
 
   async function loadFlights() {
@@ -876,35 +1164,48 @@
 
       if (error) throw error;
 
-      allFlights = data || [];
-      renderCards(allFlights);
+      const now = new Date().setHours(0,0,0,0);
+      allFlights = (data || []).filter(f => {
+        if (!f.booking_deadline) return true;
+        return new Date(f.booking_deadline).getTime() >= now;
+      });
 
-      // Build ticker
-      const ticker = document.getElementById('tickerTrack');
-      ticker.innerHTML = buildTickerHTML(allFlights);
+      renderCards(allFlights);
+      document.getElementById('tickerTrack').innerHTML = buildTickerHTML(allFlights);
 
     } catch (err) {
       console.error(err);
       document.getElementById('cardsContainer').innerHTML =
-        '<div class="empty"><div class="empty-icon">⚠️</div><p>Fırsatlar yüklenirken hata oluştu.</p></div>';
+        '<div class="empty"><div class="empty-icon">⚠️</div><h3>Hata</h3><p>Fırsatlar yüklenemedi.</p></div>';
     }
   }
 
   function filterCards(urgency, btn) {
     document.querySelectorAll('.filter').forEach(f => f.classList.remove('active'));
     btn.classList.add('active');
-
-    const filtered = urgency === 'all'
-      ? allFlights
-      : allFlights.filter(f => f.urgency === urgency);
-
+    const filtered = urgency === 'all' ? allFlights : allFlights.filter(f => f.urgency === urgency);
     renderCards(filtered);
+  }
+
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+
+    if (tab === 'flights') {
+      document.getElementById('flightsSection').classList.remove('hidden');
+      document.getElementById('campaignsSection').classList.add('hidden');
+    } else {
+      document.getElementById('flightsSection').classList.add('hidden');
+      document.getElementById('campaignsSection').classList.remove('hidden');
+      loadCampaigns();
+    }
   }
 
   function openModal(id) {
     const f = allFlights.find(x => x.id === id);
     if (!f) return;
     currentFlight = f;
+    trackClick(id, 'view');
 
     const disc = calcDiscount(f.price, f.normal_price);
     document.getElementById('modalTitle').textContent = `${f.from_city} → ${f.to_city}`;
@@ -921,9 +1222,30 @@
     const note = document.getElementById('modalNote');
     if (f.editor_note) {
       note.textContent = '✏️ ' + f.editor_note;
-      note.style.display = 'block';
+      note.classList.remove('hidden');
     } else {
-      note.style.display = 'none';
+      note.classList.add('hidden');
+    }
+
+    const cdContainer = document.getElementById('modalCountdown');
+    if (f.booking_deadline) {
+      const updateCountdown = () => {
+        const t = timeUntil(f.booking_deadline);
+        if (t) {
+          cdContainer.innerHTML = `
+            <div class="countdown">
+              <div class="countdown-label">Bu Fiyat İçin Kalan Süre</div>
+              <div class="countdown-value">⏱️ ${t}</div>
+            </div>`;
+        } else {
+          cdContainer.innerHTML = '';
+        }
+      };
+      updateCountdown();
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = setInterval(updateCountdown, 60000);
+    } else {
+      cdContainer.innerHTML = '';
     }
 
     document.getElementById('modal').classList.add('open');
@@ -931,37 +1253,18 @@
 
   function closeModal() {
     document.getElementById('modal').classList.remove('open');
+    if (countdownInterval) clearInterval(countdownInterval);
   }
 
   function closeModalOutside(e) {
     if (e.target === document.getElementById('modal')) closeModal();
   }
 
-  function toSkyDate(dateStr) {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    const yy = String(d.getFullYear()).slice(2);
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${yy}${mm}${dd}`;
-  }
-
-  function openBooking(id) {
-    const f = id ? allFlights.find(x => x.id === id) : currentFlight;
-    if (!f) return;
-    const city = encodeURIComponent(f.to_city || '');
-    const checkin = f.departure_date || '';
-    const checkout = f.return_date || '';
-    let url = `https://www.booking.com/searchresults.tr.html?ss=${city}`;
-    if (checkin) url += `&checkin=${checkin}`;
-    if (checkout) url += `&checkout=${checkout}`;
-    window.open(url, '_blank');
-  }
-
-
   function openSkyscanner(id) {
     const f = id ? allFlights.find(x => x.id === id) : currentFlight;
     if (!f) return;
+    trackClick(f.id, 'skyscanner');
+
     const from = f.from_code || 'IST';
     const to = f.to_code || '';
     const dep = toSkyDate(f.departure_date);
@@ -977,24 +1280,65 @@
     window.open(url, '_blank');
   }
 
-  function openFlights() {
-    openSkyscanner(null);
+  function openBooking(id) {
+    const f = id ? allFlights.find(x => x.id === id) : currentFlight;
+    if (!f) return;
+    trackClick(f.id, 'booking');
+
+    const city = encodeURIComponent(f.to_city || '');
+    const checkin = f.departure_date || '';
+    const checkout = f.return_date || '';
+    let url = `https://www.booking.com/searchresults.tr.html?ss=${city}`;
+    if (checkin) url += `&checkin=${checkin}`;
+    if (checkout) url += `&checkout=${checkout}`;
+    window.open(url, '_blank');
+  }
+
+  function buildShareText(f) {
+    const disc = calcDiscount(f.price, f.normal_price);
+    return `✈️ ${f.from_city} → ${f.to_city} sadece ${formatPrice(f.price)}!${disc ? ` Normalde ${formatPrice(f.normal_price)}, %${disc} indirim.` : ''} Tüm fırsatlar: https://golow.vercel.app`;
+  }
+
+  function shareFlightCard(id) {
+    const f = allFlights.find(x => x.id === id);
+    if (!f) return;
+    currentFlight = f;
+    if (navigator.share) {
+      navigator.share({ title: 'Golow Fırsatı', text: buildShareText(f), url: 'https://golow.vercel.app' })
+        .then(() => trackClick(id, 'share', 'native'))
+        .catch(() => {});
+    } else {
+      shareFlight('copy');
+    }
+  }
+
+  function shareFlight(platform) {
+    if (!currentFlight) return;
+    const text = buildShareText(currentFlight);
+    trackClick(currentFlight.id, 'share', platform);
+
+    if (platform === 'whatsapp') {
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    } else if (platform === 'twitter') {
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+    } else if (platform === 'copy') {
+      navigator.clipboard.writeText(text).then(() => showToast('🔗 Link kopyalandı!'));
+    }
   }
 
   function handleSubscribe() {
     const input = document.getElementById('emailInput');
     if (input.value.includes('@')) {
-      window.open('https://golow.substack.com', '_blank');
+      showToast('✅ Yönlendiriliyorsun...');
+      setTimeout(() => window.open('https://golow.substack.com', '_blank'), 800);
       input.value = '';
-      input.placeholder = '✅ Yönlendiriliyorsunuz...';
-      input.style.borderColor = 'var(--green)';
     } else {
-      input.style.borderColor = 'var(--accent)';
-      input.placeholder = 'Geçerli bir e-posta gir';
+      showToast('⚠️ Geçerli bir e-posta gir');
     }
   }
 
   loadFlights();
+  setInterval(loadFlights, 300000);
 </script>
 </body>
 </html>

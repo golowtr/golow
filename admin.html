@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Golow Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%9A%99%EF%B8%8F</text></svg>">
+<link rel="preconnect" href="https://fonts.bunny.net">
+<link href="https://fonts.bunny.net/css?family=outfit:600,700,800|inter:400,500,600" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
@@ -14,9 +16,11 @@
     --text: #1a1a2e;
     --muted: #8890a8;
     --accent: #1e6ff0;
+    --accent-dark: #1558d6;
     --green: #00b87a;
     --yellow: #f0b400;
     --blue: #1aa3d4;
+    --orange: #e85d20;
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -24,8 +28,10 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
 
   /* LOGIN */
@@ -34,37 +40,40 @@
     align-items: center;
     justify-content: center;
     min-height: 100vh;
+    padding: 20px;
   }
 
   .login-box {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 20px;
-    padding: 48px;
+    padding: 40px;
     width: 360px;
     text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.04);
   }
 
   .login-logo {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Outfit', sans-serif;
     font-size: 28px;
     font-weight: 800;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
+    letter-spacing: -1px;
   }
 
   .login-logo span { color: var(--accent); }
-  .login-sub { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+  .login-sub { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
 
-  .form-group { margin-bottom: 16px; text-align: left; }
+  .form-group { margin-bottom: 14px; text-align: left; }
 
   .form-label {
     display: block;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 600;
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   .form-input, .form-select, .form-textarea {
@@ -72,50 +81,51 @@
     background: var(--bg);
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 12px 16px;
-    border-radius: 10px;
+    padding: 10px 14px;
+    border-radius: 9px;
     font-size: 14px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: inherit;
     outline: none;
     transition: border-color 0.2s;
   }
 
   .form-input:focus, .form-select:focus, .form-textarea:focus {
     border-color: var(--accent);
+    background: white;
   }
 
   .form-select { cursor: pointer; }
-  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-textarea { resize: vertical; min-height: 70px; }
 
   .btn {
-    width: 100%;
-    padding: 14px;
-    border-radius: 10px;
-    font-size: 14px;
+    padding: 11px 16px;
+    border-radius: 9px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
+    font-family: inherit;
     border: none;
     transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
   }
 
+  .btn-block { width: 100%; padding: 13px; font-size: 14px; }
   .btn-primary { background: var(--accent); color: white; }
-  .btn-primary:hover { background: #1558d6; transform: translateY(-1px); }
-  .btn-secondary {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text);
-  }
+  .btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); }
+  .btn-secondary { background: white; border: 1px solid var(--border); color: var(--text); }
   .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
-  .btn-danger { background: rgba(255,77,109,0.15); color: var(--accent); border: 1px solid rgba(255,77,109,0.3); }
-  .btn-danger:hover { background: var(--accent); color: white; }
-  .btn-sm { width: auto; padding: 6px 14px; font-size: 12px; }
-  .btn-success { background: rgba(0,229,160,0.15); color: var(--green); border: 1px solid rgba(0,229,160,0.3); }
-  .btn-success:hover { background: var(--green); color: var(--bg); }
+  .btn-danger { background: rgba(232,93,32,0.1); color: var(--orange); border: 1px solid rgba(232,93,32,0.25); }
+  .btn-danger:hover { background: var(--orange); color: white; }
+  .btn-success { background: rgba(0,184,122,0.1); color: var(--green); border: 1px solid rgba(0,184,122,0.25); }
+  .btn-success:hover { background: var(--green); color: white; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
 
-  .error-msg { color: var(--accent); font-size: 13px; margin-top: 8px; text-align: center; }
+  .error-msg { color: var(--orange); font-size: 13px; margin-top: 8px; }
 
-  /* ADMIN LAYOUT */
+  /* ADMIN */
   .admin { display: none; }
   .admin.visible { display: block; }
 
@@ -123,78 +133,112 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 40px;
+    padding: 16px 24px;
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
     background: rgba(245,246,250,0.95);
     backdrop-filter: blur(20px);
     z-index: 100;
+    flex-wrap: wrap;
+    gap: 12px;
   }
 
   .header-logo {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Outfit', sans-serif;
     font-weight: 800;
     font-size: 22px;
+    letter-spacing: -1px;
   }
 
   .header-logo span { color: var(--accent); }
+
   .header-badge {
-    background: rgba(255,214,10,0.15);
-    color: var(--yellow);
-    border: 1px solid rgba(255,214,10,0.3);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-    margin-left: 10px;
+    background: rgba(240,180,0,0.15);
+    color: #b38600;
+    border: 1px solid rgba(240,180,0,0.3);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 100px;
+    margin-left: 8px;
+    letter-spacing: 1px;
   }
 
-  .header-actions { display: flex; gap: 12px; align-items: center; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
 
-  .main { padding: 40px; }
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 16px 24px 0;
+    max-width: 1400px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .tab:hover { color: var(--text); background: var(--surface); }
+  .tab.active { background: var(--surface); color: var(--accent); border: 1px solid var(--border); }
+
+  .main { padding: 24px; max-width: 1400px; margin: 0 auto; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
 
   /* STATS */
   .stats {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 16px;
-    margin-bottom: 40px;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
   }
 
   .stat {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 20px;
+    padding: 18px;
   }
 
-  .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-  .stat-value { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; font-weight: 600; }
+  .stat-value { font-family: 'Outfit', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -1px; }
 
   /* FORM CARD */
   .form-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 32px;
-    margin-bottom: 40px;
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 24px;
   }
 
   .form-card-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 18px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 17px;
     font-weight: 700;
-    margin-bottom: 24px;
+    margin-bottom: 18px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
 
   .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
   }
 
   .form-grid .form-group { margin-bottom: 0; }
@@ -202,17 +246,18 @@
 
   .form-actions {
     display: flex;
-    gap: 12px;
-    margin-top: 24px;
-    padding-top: 24px;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
     border-top: 1px solid var(--border);
+    flex-wrap: wrap;
   }
 
-  /* FLIGHTS TABLE */
+  /* TABLE */
   .table-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 14px;
     overflow: hidden;
   }
 
@@ -220,38 +265,43 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 24px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .table-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 16px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
     font-weight: 700;
   }
+
+  .table-wrapper { overflow-x: auto; }
 
   table { width: 100%; border-collapse: collapse; }
 
   th {
     text-align: left;
-    padding: 12px 16px;
-    font-size: 11px;
-    font-weight: 600;
+    padding: 11px 16px;
+    font-size: 10px;
+    font-weight: 700;
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 1px;
     border-bottom: 1px solid var(--border);
+    background: var(--bg);
   }
 
   td {
-    padding: 14px 16px;
+    padding: 13px 16px;
     font-size: 13px;
-    border-bottom: 1px solid rgba(30,30,46,0.5);
+    border-bottom: 1px solid rgba(228,230,240,0.6);
     vertical-align: middle;
   }
 
   tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(255,255,255,0.02); }
+  tr:hover td { background: rgba(30,111,240,0.02); }
 
   .badge {
     font-size: 10px;
@@ -259,17 +309,18 @@
     padding: 3px 8px;
     border-radius: 6px;
     letter-spacing: 0.5px;
+    white-space: nowrap;
   }
 
-  .badge-hot { background: rgba(255,77,109,0.2); color: var(--accent); }
-  .badge-good { background: rgba(0,229,160,0.15); color: var(--green); }
-  .badge-new { background: rgba(76,201,240,0.15); color: var(--blue); }
-  .badge-alert { background: rgba(255,214,10,0.15); color: var(--yellow); }
+  .badge-hot { background: rgba(232,93,32,0.15); color: var(--orange); }
+  .badge-good { background: rgba(0,184,122,0.12); color: var(--green); }
+  .badge-new { background: rgba(26,163,212,0.12); color: var(--blue); }
+  .badge-alert { background: rgba(240,180,0,0.15); color: #b38600; }
 
-  .status-on { color: var(--green); font-size: 12px; }
+  .status-on { color: var(--green); font-size: 12px; font-weight: 600; }
   .status-off { color: var(--muted); font-size: 12px; }
 
-  .td-actions { display: flex; gap: 8px; }
+  .td-actions { display: flex; gap: 5px; flex-wrap: wrap; }
 
   .loading-row td { text-align: center; padding: 40px; color: var(--muted); }
 
@@ -278,25 +329,41 @@
     position: fixed;
     bottom: 24px;
     right: 24px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 20px;
-    font-size: 14px;
+    background: var(--text);
+    color: white;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 13px;
     z-index: 999;
     transform: translateY(100px);
     opacity: 0;
     transition: all 0.3s;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
   }
 
   .toast.show { transform: translateY(0); opacity: 1; }
-  .toast.success { border-color: var(--green); color: var(--green); }
-  .toast.error { border-color: var(--accent); color: var(--accent); }
+  .toast.success { background: var(--green); }
+  .toast.error { background: var(--orange); }
+
+  /* LOGO PREVIEW */
+  .logo-preview {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    object-fit: contain;
+    background: white;
+    border: 1px solid var(--border);
+    padding: 2px;
+  }
+
+  @media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .header-actions { flex-wrap: wrap; }
+  }
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
     <div class="login-logo">Go<span>low</span></div>
@@ -309,12 +376,11 @@
       <label class="form-label">Şifre</label>
       <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
     </div>
-    <button class="btn btn-primary" onclick="login()">Giriş Yap</button>
+    <button class="btn btn-primary btn-block" onclick="login()">Giriş Yap</button>
     <div class="error-msg" id="loginError"></div>
   </div>
 </div>
 
-<!-- ADMIN -->
 <div class="admin" id="adminPanel">
   <header>
     <div>
@@ -322,144 +388,314 @@
       <span class="header-badge">ADMIN</span>
     </div>
     <div class="header-actions">
-      <a href="index.html" target="_blank" class="btn btn-secondary btn-sm">Siteyi Gör →</a>
+      <a href="index.html" target="_blank" class="btn btn-secondary btn-sm">Siteyi Aç ↗</a>
       <button class="btn btn-secondary btn-sm" onclick="logout()">Çıkış</button>
     </div>
   </header>
 
+  <div class="tabs">
+    <button class="tab active" onclick="switchPanel('flights', this)">✈️ Fırsatlar</button>
+    <button class="tab" onclick="switchPanel('airlines', this)">🏢 Havayolları</button>
+    <button class="tab" onclick="switchPanel('campaigns', this)">🔥 Kampanyalar</button>
+    <button class="tab" onclick="switchPanel('stats', this)">📊 İstatistikler</button>
+  </div>
+
   <div class="main">
 
-    <!-- STATS -->
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-label">Toplam Fırsat</div>
-        <div class="stat-value" id="statTotal">—</div>
+    <!-- FLIGHTS PANEL -->
+    <div class="panel active" id="flightsPanel">
+      <div class="stats">
+        <div class="stat"><div class="stat-label">Toplam</div><div class="stat-value" id="statTotal">—</div></div>
+        <div class="stat"><div class="stat-label">Aktif</div><div class="stat-value" style="color:var(--green)" id="statActive">—</div></div>
+        <div class="stat"><div class="stat-label">Pasif</div><div class="stat-value" style="color:var(--muted)" id="statPassive">—</div></div>
+        <div class="stat"><div class="stat-label">Hata Fiyatı</div><div class="stat-value" style="color:var(--orange)" id="statHot">—</div></div>
       </div>
-      <div class="stat">
-        <div class="stat-label">Aktif</div>
-        <div class="stat-value" style="color:var(--green)" id="statActive">—</div>
+
+      <div class="form-card">
+        <div class="form-card-title">
+          <span id="formIcon">➕</span>
+          <span id="formTitle">Yeni Fırsat Ekle</span>
+        </div>
+        <input type="hidden" id="editId">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Nereden</label>
+            <input type="text" class="form-input" id="fromCity" placeholder="İstanbul" value="İstanbul">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nereden Kod</label>
+            <input type="text" class="form-input" id="fromCode" value="IST" maxlength="3" style="text-transform:uppercase">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nereye</label>
+            <input type="text" class="form-input" id="toCity" placeholder="Amsterdam">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nereye Kod</label>
+            <input type="text" class="form-input" id="toCode" placeholder="AMS" maxlength="3" style="text-transform:uppercase">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fiyat (₺)</label>
+            <input type="number" step="0.01" class="form-input" id="price" placeholder="890">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Normal Fiyat (₺)</label>
+            <input type="number" step="0.01" class="form-input" id="normalPrice" placeholder="3200">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Havayolu</label>
+            <select class="form-select" id="airlineId">
+              <option value="">Seç...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Uçuş Tipi</label>
+            <select class="form-select" id="tripType">
+              <option value="round_trip">Gidiş-Dönüş</option>
+              <option value="one_way">Tek Yön</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Aciliyet</label>
+            <select class="form-select" id="urgency">
+              <option value="good">✅ Çok İyi</option>
+              <option value="hot">🔥 Hata Fiyatı</option>
+              <option value="new">🆕 Yeni</option>
+              <option value="alert">⚡ Fırsat</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gidiş Tarihi</label>
+            <input type="date" class="form-input" id="departureDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dönüş Tarihi</label>
+            <input type="date" class="form-input" id="returnDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Son Alım</label>
+            <input type="date" class="form-input" id="bookingDeadline">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Durum</label>
+            <select class="form-select" id="active">
+              <option value="true">✅ Aktif</option>
+              <option value="false">⏸️ Pasif</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Editör Notu</label>
+            <textarea class="form-textarea" id="editorNote" placeholder="Bu fırsat hakkında kısa bir not..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="saveFlight()">💾 Kaydet</button>
+          <button class="btn btn-secondary" onclick="resetForm()">🔄 Temizle</button>
+        </div>
       </div>
-      <div class="stat">
-        <div class="stat-label">Pasif</div>
-        <div class="stat-value" style="color:var(--muted)" id="statPassive">—</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Hata Fiyatı</div>
-        <div class="stat-value" style="color:var(--accent)" id="statHot">—</div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <span class="table-title">Tüm Fırsatlar</span>
+          <button class="btn btn-secondary btn-sm" onclick="loadFlights()">🔄 Yenile</button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Rota</th>
+                <th>Fiyat</th>
+                <th>İndirim</th>
+                <th>Tip</th>
+                <th>Aciliyet</th>
+                <th>Gidiş</th>
+                <th>Tıklama</th>
+                <th>Durum</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="flightsTable">
+              <tr class="loading-row"><td colspan="9">Yükleniyor...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- FORM -->
-    <div class="form-card">
-      <div class="form-card-title">
-        <span id="formIcon">➕</span>
-        <span id="formTitle">Yeni Fırsat Ekle</span>
-      </div>
-      <input type="hidden" id="editId">
-
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">Nereden Şehir</label>
-          <input type="text" class="form-input" id="fromCity" placeholder="İstanbul" value="İstanbul">
+    <!-- AIRLINES PANEL -->
+    <div class="panel" id="airlinesPanel">
+      <div class="form-card">
+        <div class="form-card-title">
+          <span id="airlineFormIcon">➕</span>
+          <span id="airlineFormTitle">Havayolu Ekle</span>
         </div>
-        <div class="form-group">
-          <label class="form-label">Nereden Kod</label>
-          <input type="text" class="form-input" id="fromCode" placeholder="IST" value="IST" maxlength="3" style="text-transform:uppercase">
+        <input type="hidden" id="airlineEditId">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Adı</label>
+            <input type="text" class="form-input" id="airlineName" placeholder="Turkish Airlines">
+          </div>
+          <div class="form-group">
+            <label class="form-label">IATA Kodu</label>
+            <input type="text" class="form-input" id="airlineIata" placeholder="TK" maxlength="3" style="text-transform:uppercase">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ülke</label>
+            <input type="text" class="form-input" id="airlineCountry" placeholder="Türkiye">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Logo URL</label>
+            <input type="text" class="form-input" id="airlineLogo" placeholder="https://...">
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Nereye Şehir</label>
-          <input type="text" class="form-input" id="toCity" placeholder="Amsterdam">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Nereye Kod</label>
-          <input type="text" class="form-input" id="toCode" placeholder="AMS" maxlength="3" style="text-transform:uppercase">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Fiyat (₺)</label>
-          <input type="number" class="form-input" id="price" placeholder="890">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Normal Fiyat (₺)</label>
-          <input type="number" class="form-input" id="normalPrice" placeholder="3200">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Uçuş Tipi</label>
-          <select class="form-select" id="tripType">
-            <option value="round_trip">Gidiş-Dönüş</option>
-            <option value="one_way">Tek Yön</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Aciliyet</label>
-          <select class="form-select" id="urgency">
-            <option value="good">✅ Çok İyi</option>
-            <option value="hot">🔥 Hata Fiyatı</option>
-            <option value="new">🆕 Yeni</option>
-            <option value="alert">⚡ Fırsat</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Gidiş Tarihi</label>
-          <input type="date" class="form-input" id="departureDate">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Dönüş Tarihi</label>
-          <input type="date" class="form-input" id="returnDate">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Son Alım Tarihi</label>
-          <input type="date" class="form-input" id="bookingDeadline">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Durum</label>
-          <select class="form-select" id="active">
-            <option value="true">✅ Aktif</option>
-            <option value="false">⏸️ Pasif</option>
-          </select>
-        </div>
-        <div class="form-group full">
-          <label class="form-label">Editör Notu</label>
-          <textarea class="form-textarea" id="editorNote" placeholder="Bu fırsat hakkında kısa bir not..."></textarea>
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="saveAirline()">💾 Kaydet</button>
+          <button class="btn btn-secondary" onclick="resetAirlineForm()">🔄 Temizle</button>
         </div>
       </div>
 
-      <div class="form-actions">
-        <button class="btn btn-primary" onclick="saveFlight()" style="max-width:200px">Kaydet</button>
-        <button class="btn btn-secondary" onclick="resetForm()" style="max-width:140px">Temizle</button>
+      <div class="table-card">
+        <div class="table-header">
+          <span class="table-title">Havayolları</span>
+          <button class="btn btn-secondary btn-sm" onclick="loadAirlines()">🔄 Yenile</button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr><th>Logo</th><th>Adı</th><th>Kod</th><th>Ülke</th><th>İşlem</th></tr>
+            </thead>
+            <tbody id="airlinesTable">
+              <tr class="loading-row"><td colspan="5">Yükleniyor...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- TABLE -->
-    <div class="table-card">
-      <div class="table-header">
-        <span class="table-title">Tüm Fırsatlar</span>
-        <button class="btn btn-secondary btn-sm" onclick="loadFlights()">🔄 Yenile</button>
+    <!-- CAMPAIGNS PANEL -->
+    <div class="panel" id="campaignsPanel">
+      <div class="form-card">
+        <div class="form-card-title">
+          <span>➕</span>
+          <span>Kampanya Ekle</span>
+        </div>
+        <input type="hidden" id="campaignEditId">
+        <div class="form-grid">
+          <div class="form-group full">
+            <label class="form-label">Başlık</label>
+            <input type="text" class="form-input" id="campaignTitle" placeholder="Pegasus'ta %40 İndirim">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Açıklama</label>
+            <textarea class="form-textarea" id="campaignDesc" placeholder="Tüm Avrupa hatlarında geçerli..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Havayolu</label>
+            <select class="form-select" id="campaignAirline"><option value="">Seç...</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">İndirim Tipi</label>
+            <select class="form-select" id="campaignDiscType">
+              <option value="ratio">% Yüzde</option>
+              <option value="amount">₺ TL</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">İndirim Miktarı</label>
+            <input type="number" step="0.01" class="form-input" id="campaignDiscValue" placeholder="40">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Kapsam</label>
+            <select class="form-select" id="campaignScope">
+              <option value="both">Tümü</option>
+              <option value="domestic">Yurt İçi</option>
+              <option value="international">Yurt Dışı</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Satış Başlangıç</label>
+            <input type="date" class="form-input" id="campaignSaleStart">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Satış Bitiş</label>
+            <input type="date" class="form-input" id="campaignSaleEnd">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Seyahat Başlangıç</label>
+            <input type="date" class="form-input" id="campaignTravelStart">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Seyahat Bitiş</label>
+            <input type="date" class="form-input" id="campaignTravelEnd">
+          </div>
+          <div class="form-group">
+            <label class="form-label">URL</label>
+            <input type="text" class="form-input" id="campaignUrl" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Durum</label>
+            <select class="form-select" id="campaignActive">
+              <option value="true">✅ Aktif</option>
+              <option value="false">⏸️ Pasif</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="saveCampaign()">💾 Kaydet</button>
+          <button class="btn btn-secondary" onclick="resetCampaignForm()">🔄 Temizle</button>
+        </div>
       </div>
-      <div style="overflow-x:auto">
-        <table>
-          <thead>
-            <tr>
-              <th>Rota</th>
-              <th>Fiyat</th>
-              <th>İndirim</th>
-              <th>Uçuş Tipi</th>
-              <th>Aciliyet</th>
-              <th>Gidiş</th>
-              <th>Durum</th>
-              <th>İşlem</th>
-            </tr>
-          </thead>
-          <tbody id="flightsTable">
-            <tr class="loading-row"><td colspan="8">Yükleniyor...</td></tr>
-          </tbody>
-        </table>
+
+      <div class="table-card">
+        <div class="table-header">
+          <span class="table-title">Kampanyalar</span>
+          <button class="btn btn-secondary btn-sm" onclick="loadCampaigns()">🔄 Yenile</button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr><th>Başlık</th><th>İndirim</th><th>Tarihler</th><th>Durum</th><th>İşlem</th></tr>
+            </thead>
+            <tbody id="campaignsTable">
+              <tr class="loading-row"><td colspan="5">Yükleniyor...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS PANEL -->
+    <div class="panel" id="statsPanel">
+      <div class="stats">
+        <div class="stat"><div class="stat-label">Toplam Tıklama</div><div class="stat-value" id="totalClicks">—</div></div>
+        <div class="stat"><div class="stat-label">Skyscanner</div><div class="stat-value" style="color:var(--accent)" id="totalSkyscanner">—</div></div>
+        <div class="stat"><div class="stat-label">Booking</div><div class="stat-value" style="color:#003580" id="totalBooking">—</div></div>
+        <div class="stat"><div class="stat-label">Paylaşım</div><div class="stat-value" style="color:var(--green)" id="totalShares">—</div></div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <span class="table-title">En Çok Tıklanan Fırsatlar</span>
+          <button class="btn btn-secondary btn-sm" onclick="loadStats()">🔄 Yenile</button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr><th>Rota</th><th>Görüntüleme</th><th>Skyscanner</th><th>Booking</th><th>Paylaşım</th><th>Toplam</th></tr>
+            </thead>
+            <tbody id="statsTable">
+              <tr class="loading-row"><td colspan="6">Yükleniyor...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
@@ -468,6 +704,8 @@
 
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  let allAirlines = [];
+
   // AUTH
   async function login() {
     const email = document.getElementById('loginEmail').value;
@@ -475,12 +713,8 @@
     const err = document.getElementById('loginError');
 
     const { error } = await sb.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      err.textContent = 'Hatalı e-posta veya şifre.';
-    } else {
-      showAdmin();
-    }
+    if (error) err.textContent = 'Hatalı e-posta veya şifre.';
+    else showAdmin();
   }
 
   async function logout() {
@@ -491,23 +725,32 @@
 
   async function checkAuth() {
     const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      showAdmin();
-    }
+    if (session) showAdmin();
   }
 
   function showAdmin() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminPanel').classList.add('visible');
+    loadAirlines();
     loadFlights();
   }
 
-  // TOAST
   function showToast(msg, type = 'success') {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.className = `toast ${type} show`;
-    setTimeout(() => t.classList.remove('show'), 3000);
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function switchPanel(panel, btn) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(panel + 'Panel').classList.add('active');
+
+    if (panel === 'airlines') loadAirlines();
+    if (panel === 'campaigns') { loadCampaignsForAdmin(); populateAirlineSelects(); }
+    if (panel === 'stats') loadStats();
   }
 
   // HELPERS
@@ -528,56 +771,142 @@
     alert: '<span class="badge badge-alert">⚡ FIRSAT</span>'
   };
 
-  // LOAD
-  async function loadFlights() {
-    const { data, error } = await sb
-      .from('flights')
-      .select('*')
-      .order('created_at', { ascending: false });
+  // ============ AIRLINES ============
+  async function loadAirlines() {
+    const { data, error } = await sb.from('airlines').select('*').order('name', { ascending: true });
+    if (error) { showToast('Havayolları yüklenemedi', 'error'); return; }
 
+    allAirlines = data || [];
+    populateAirlineSelects();
+
+    const tbody = document.getElementById('airlinesTable');
+    if (!allAirlines.length) {
+      tbody.innerHTML = '<tr class="loading-row"><td colspan="5">Henüz havayolu yok.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = allAirlines.map(a => `
+      <tr>
+        <td>${a.logo_url ? `<img src="${a.logo_url}" class="logo-preview" onerror="this.style.display='none'">` : '✈️'}</td>
+        <td><strong>${a.name || '—'}</strong></td>
+        <td>${a.iata_code || '—'}</td>
+        <td>${a.country || '—'}</td>
+        <td>
+          <div class="td-actions">
+            <button class="btn btn-secondary btn-sm" onclick="editAirline(${a.id})">Düzenle</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteAirline(${a.id})">Sil</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  function populateAirlineSelects() {
+    const selects = [document.getElementById('airlineId'), document.getElementById('campaignAirline')];
+    selects.forEach(sel => {
+      if (!sel) return;
+      const current = sel.value;
+      sel.innerHTML = '<option value="">Seç...</option>' +
+        allAirlines.map(a => `<option value="${a.id}">${a.name} ${a.iata_code ? '('+a.iata_code+')' : ''}</option>`).join('');
+      sel.value = current;
+    });
+  }
+
+  async function saveAirline() {
+    const id = document.getElementById('airlineEditId').value;
+    const payload = {
+      name: document.getElementById('airlineName').value,
+      iata_code: document.getElementById('airlineIata').value.toUpperCase() || null,
+      country: document.getElementById('airlineCountry').value || null,
+      logo_url: document.getElementById('airlineLogo').value || null,
+      active: true
+    };
+    if (!payload.name) { showToast('Havayolu adı zorunlu', 'error'); return; }
+
+    const { error } = id
+      ? await sb.from('airlines').update(payload).eq('id', id)
+      : await sb.from('airlines').insert(payload);
+
+    if (error) showToast('Hata: ' + error.message, 'error');
+    else { showToast('✅ Kaydedildi'); resetAirlineForm(); loadAirlines(); }
+  }
+
+  async function editAirline(id) {
+    const a = allAirlines.find(x => x.id === id);
+    if (!a) return;
+    document.getElementById('airlineEditId').value = a.id;
+    document.getElementById('airlineFormTitle').textContent = 'Havayolu Düzenle';
+    document.getElementById('airlineFormIcon').textContent = '✏️';
+    document.getElementById('airlineName').value = a.name || '';
+    document.getElementById('airlineIata').value = a.iata_code || '';
+    document.getElementById('airlineCountry').value = a.country || '';
+    document.getElementById('airlineLogo').value = a.logo_url || '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function deleteAirline(id) {
+    if (!confirm('Bu havayolunu silmek istediğine emin misin?')) return;
+    const { error } = await sb.from('airlines').delete().eq('id', id);
+    if (error) showToast('Silme hatası', 'error');
+    else { showToast('🗑️ Silindi'); loadAirlines(); }
+  }
+
+  function resetAirlineForm() {
+    document.getElementById('airlineEditId').value = '';
+    document.getElementById('airlineFormTitle').textContent = 'Havayolu Ekle';
+    document.getElementById('airlineFormIcon').textContent = '➕';
+    ['airlineName','airlineIata','airlineCountry','airlineLogo'].forEach(id => document.getElementById(id).value = '');
+  }
+
+  // ============ FLIGHTS ============
+  async function loadFlights() {
+    const { data, error } = await sb.from('flights').select('*, airlines(name, logo_url)').order('created_at', { ascending: false });
     if (error) { showToast('Yükleme hatası', 'error'); return; }
 
     const flights = data || [];
     const active = flights.filter(f => f.active).length;
-
     document.getElementById('statTotal').textContent = flights.length;
     document.getElementById('statActive').textContent = active;
     document.getElementById('statPassive').textContent = flights.length - active;
     document.getElementById('statHot').textContent = flights.filter(f => f.urgency === 'hot').length;
 
-    const tbody = document.getElementById('flightsTable');
+    // Get click counts
+    const { data: clickData } = await sb.from('clicks').select('flight_id');
+    const clickCounts = {};
+    (clickData || []).forEach(c => { clickCounts[c.flight_id] = (clickCounts[c.flight_id] || 0) + 1; });
 
+    const tbody = document.getElementById('flightsTable');
     if (!flights.length) {
-      tbody.innerHTML = '<tr class="loading-row"><td colspan="8">Henüz fırsat yok. Yukarıdan ekleyin.</td></tr>';
+      tbody.innerHTML = '<tr class="loading-row"><td colspan="9">Henüz fırsat yok.</td></tr>';
       return;
     }
 
     tbody.innerHTML = flights.map(f => {
       const disc = calcDiscount(f.price, f.normal_price);
+      const clicks = clickCounts[f.id] || 0;
       return `
         <tr>
-          <td><strong>${f.from_code || 'IST'} → ${f.to_code || f.to_city}</strong><br>
-              <small style="color:var(--muted)">${f.from_city} → ${f.to_city}</small></td>
+          <td>
+            <strong>${f.from_code || 'IST'} → ${f.to_code || ''}</strong><br>
+            <small style="color:var(--muted)">${f.from_city} → ${f.to_city}</small>
+          </td>
           <td><strong>₺${Number(f.price).toLocaleString('tr-TR')}</strong></td>
           <td>${disc ? `%${disc}` : '—'}</td>
           <td>${f.trip_type === 'round_trip' ? 'Gidiş-dönüş' : 'Tek yön'}</td>
           <td>${badgeMap[f.urgency] || '—'}</td>
           <td>${formatDate(f.departure_date)}</td>
-          <td>${f.active
-            ? '<span class="status-on">● Aktif</span>'
-            : '<span class="status-off">○ Pasif</span>'}</td>
+          <td><strong>${clicks}</strong></td>
+          <td>${f.active ? '<span class="status-on">● Aktif</span>' : '<span class="status-off">○ Pasif</span>'}</td>
           <td>
             <div class="td-actions">
               <button class="btn btn-secondary btn-sm" onclick="editFlight(${f.id})">Düzenle</button>
+              <button class="btn btn-success btn-sm" onclick="toggleActive(${f.id}, ${f.active})">${f.active ? 'Pasif' : 'Aktif'}</button>
               <button class="btn btn-danger btn-sm" onclick="deleteFlight(${f.id})">Sil</button>
-              <button class="btn btn-success btn-sm" onclick="toggleActive(${f.id}, ${f.active})">${f.active ? 'Pasif Et' : 'Aktif Et'}</button>
             </div>
           </td>
         </tr>`;
     }).join('');
   }
 
-  // SAVE
   async function saveFlight() {
     const editId = document.getElementById('editId').value;
 
@@ -588,6 +917,7 @@
       to_code: document.getElementById('toCode').value.toUpperCase(),
       price: parseFloat(document.getElementById('price').value) || null,
       normal_price: parseFloat(document.getElementById('normalPrice').value) || null,
+      airline_id: parseInt(document.getElementById('airlineId').value) || null,
       trip_type: document.getElementById('tripType').value,
       urgency: document.getElementById('urgency').value,
       departure_date: document.getElementById('departureDate').value || null,
@@ -598,28 +928,17 @@
     };
 
     if (!payload.to_city || !payload.price) {
-      showToast('Nereye şehri ve fiyat zorunlu!', 'error');
+      showToast('Nereye ve fiyat zorunlu!', 'error');
       return;
     }
 
-    let error;
-    if (editId) {
-      ({ error } = await sb.from('flights').update(payload).eq('id', editId));
-    } else {
-      ({ error } = await sb.from('flights').insert(payload));
-    }
+    const { error } = editId
+      ? await sb.from('flights').update(payload).eq('id', editId)
+      : await sb.from('flights').insert(payload);
 
-    if (error) {
-      showToast('Kayıt hatası: ' + error.message, 'error');
-    } else {
-      showToast(editId ? '✅ Güncellendi!' : '✅ Fırsat eklendi!');
-      resetForm();
-      loadFlights();
-    }
+    if (error) showToast('Kayıt hatası: ' + error.message, 'error');
+    else { showToast(editId ? '✅ Güncellendi!' : '✅ Eklendi!'); resetForm(); loadFlights(); }
   }
-
-  // EDIT
-  let allFlightsData = [];
 
   async function editFlight(id) {
     const { data } = await sb.from('flights').select('*').eq('id', id).single();
@@ -634,6 +953,7 @@
     document.getElementById('toCode').value = data.to_code || '';
     document.getElementById('price').value = data.price || '';
     document.getElementById('normalPrice').value = data.normal_price || '';
+    document.getElementById('airlineId').value = data.airline_id || '';
     document.getElementById('tripType').value = data.trip_type || 'round_trip';
     document.getElementById('urgency').value = data.urgency || 'good';
     document.getElementById('departureDate').value = data.departure_date || '';
@@ -641,11 +961,9 @@
     document.getElementById('bookingDeadline').value = data.booking_deadline || '';
     document.getElementById('editorNote').value = data.editor_note || '';
     document.getElementById('active').value = data.active ? 'true' : 'false';
-
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // DELETE
   async function deleteFlight(id) {
     if (!confirm('Bu fırsatı silmek istediğine emin misin?')) return;
     const { error } = await sb.from('flights').delete().eq('id', id);
@@ -653,14 +971,12 @@
     else { showToast('🗑️ Silindi'); loadFlights(); }
   }
 
-  // TOGGLE
   async function toggleActive(id, current) {
     const { error } = await sb.from('flights').update({ active: !current }).eq('id', id);
     if (error) showToast('Hata', 'error');
-    else { showToast(current ? '⏸️ Pasife alındı' : '✅ Aktif edildi'); loadFlights(); }
+    else { showToast(current ? '⏸️ Pasif yapıldı' : '✅ Aktif yapıldı'); loadFlights(); }
   }
 
-  // RESET
   function resetForm() {
     document.getElementById('editId').value = '';
     document.getElementById('formTitle').textContent = 'Yeni Fırsat Ekle';
@@ -669,9 +985,151 @@
      'departureDate','returnDate','bookingDeadline','editorNote'].forEach(id => {
       document.getElementById(id).value = id === 'fromCity' ? 'İstanbul' : id === 'fromCode' ? 'IST' : '';
     });
+    document.getElementById('airlineId').value = '';
     document.getElementById('tripType').value = 'round_trip';
     document.getElementById('urgency').value = 'good';
     document.getElementById('active').value = 'true';
+  }
+
+  // ============ CAMPAIGNS ============
+  async function loadCampaignsForAdmin() {
+    const { data, error } = await sb.from('campaign').select('*').order('created_at', { ascending: false });
+    if (error) { showToast('Kampanya yükleme hatası', 'error'); return; }
+
+    const campaigns = data || [];
+    const tbody = document.getElementById('campaignsTable');
+
+    if (!campaigns.length) {
+      tbody.innerHTML = '<tr class="loading-row"><td colspan="5">Henüz kampanya yok.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = campaigns.map(c => {
+      const disc = c.discount_type === 'ratio' ? `%${c.discount_value}` : `${c.discount_value}₺`;
+      return `
+        <tr>
+          <td><strong>${c.title || '—'}</strong></td>
+          <td>${c.discount_value ? disc : '—'}</td>
+          <td>${c.travel_start ? formatDate(c.travel_start) + ' - ' + formatDate(c.travel_end) : '—'}</td>
+          <td>${c.active ? '<span class="status-on">● Aktif</span>' : '<span class="status-off">○ Pasif</span>'}</td>
+          <td>
+            <div class="td-actions">
+              <button class="btn btn-secondary btn-sm" onclick="editCampaign(${c.id})">Düzenle</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteCampaign(${c.id})">Sil</button>
+            </div>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  async function saveCampaign() {
+    const id = document.getElementById('campaignEditId').value;
+    const payload = {
+      title: document.getElementById('campaignTitle').value,
+      description: document.getElementById('campaignDesc').value || null,
+      airline_id: parseInt(document.getElementById('campaignAirline').value) || null,
+      discount_type: document.getElementById('campaignDiscType').value,
+      discount_value: parseFloat(document.getElementById('campaignDiscValue').value) || null,
+      scope: document.getElementById('campaignScope').value,
+      sale_start: document.getElementById('campaignSaleStart').value || null,
+      sale_end: document.getElementById('campaignSaleEnd').value || null,
+      travel_start: document.getElementById('campaignTravelStart').value || null,
+      travel_end: document.getElementById('campaignTravelEnd').value || null,
+      url: document.getElementById('campaignUrl').value || null,
+      active: document.getElementById('campaignActive').value === 'true'
+    };
+
+    if (!payload.title) { showToast('Başlık zorunlu', 'error'); return; }
+
+    const { error } = id
+      ? await sb.from('campaign').update(payload).eq('id', id)
+      : await sb.from('campaign').insert(payload);
+
+    if (error) showToast('Hata: ' + error.message, 'error');
+    else { showToast('✅ Kaydedildi'); resetCampaignForm(); loadCampaignsForAdmin(); }
+  }
+
+  async function editCampaign(id) {
+    const { data } = await sb.from('campaign').select('*').eq('id', id).single();
+    if (!data) return;
+    document.getElementById('campaignEditId').value = data.id;
+    document.getElementById('campaignTitle').value = data.title || '';
+    document.getElementById('campaignDesc').value = data.description || '';
+    document.getElementById('campaignAirline').value = data.airline_id || '';
+    document.getElementById('campaignDiscType').value = data.discount_type || 'ratio';
+    document.getElementById('campaignDiscValue').value = data.discount_value || '';
+    document.getElementById('campaignScope').value = data.scope || 'both';
+    document.getElementById('campaignSaleStart').value = data.sale_start || '';
+    document.getElementById('campaignSaleEnd').value = data.sale_end || '';
+    document.getElementById('campaignTravelStart').value = data.travel_start || '';
+    document.getElementById('campaignTravelEnd').value = data.travel_end || '';
+    document.getElementById('campaignUrl').value = data.url || '';
+    document.getElementById('campaignActive').value = data.active ? 'true' : 'false';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function deleteCampaign(id) {
+    if (!confirm('Bu kampanyayı silmek istediğine emin misin?')) return;
+    const { error } = await sb.from('campaign').delete().eq('id', id);
+    if (error) showToast('Silme hatası', 'error');
+    else { showToast('🗑️ Silindi'); loadCampaignsForAdmin(); }
+  }
+
+  function resetCampaignForm() {
+    document.getElementById('campaignEditId').value = '';
+    ['campaignTitle','campaignDesc','campaignDiscValue','campaignSaleStart',
+     'campaignSaleEnd','campaignTravelStart','campaignTravelEnd','campaignUrl'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('campaignAirline').value = '';
+    document.getElementById('campaignDiscType').value = 'ratio';
+    document.getElementById('campaignScope').value = 'both';
+    document.getElementById('campaignActive').value = 'true';
+  }
+
+  // ============ STATS ============
+  async function loadStats() {
+    const { data: clicks } = await sb.from('clicks').select('*');
+    const all = clicks || [];
+
+    document.getElementById('totalClicks').textContent = all.length;
+    document.getElementById('totalSkyscanner').textContent = all.filter(c => c.destination === 'skyscanner').length;
+    document.getElementById('totalBooking').textContent = all.filter(c => c.destination === 'booking').length;
+    document.getElementById('totalShares').textContent = all.filter(c => c.destination === 'share').length;
+
+    const { data: flights } = await sb.from('flights').select('id, from_city, to_city, from_code, to_code');
+    const flightMap = {};
+    (flights || []).forEach(f => { flightMap[f.id] = f; });
+
+    const stats = {};
+    all.forEach(c => {
+      if (!c.flight_id) return;
+      if (!stats[c.flight_id]) stats[c.flight_id] = { view: 0, skyscanner: 0, booking: 0, share: 0 };
+      if (stats[c.flight_id][c.destination] !== undefined) stats[c.flight_id][c.destination]++;
+    });
+
+    const sorted = Object.entries(stats)
+      .map(([id, s]) => ({ id, ...s, total: s.view + s.skyscanner + s.booking + s.share, flight: flightMap[id] }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 10);
+
+    const tbody = document.getElementById('statsTable');
+    if (!sorted.length) {
+      tbody.innerHTML = '<tr class="loading-row"><td colspan="6">Henüz tıklama verisi yok.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = sorted.map(s => `
+      <tr>
+        <td>${s.flight ? `<strong>${s.flight.from_code} → ${s.flight.to_code}</strong><br><small style="color:var(--muted)">${s.flight.from_city} → ${s.flight.to_city}</small>` : 'Silinmiş fırsat'}</td>
+        <td>${s.view}</td>
+        <td>${s.skyscanner}</td>
+        <td>${s.booking}</td>
+        <td>${s.share}</td>
+        <td><strong>${s.total}</strong></td>
+      </tr>`).join('');
+  }
+
+  function loadCampaigns() {
+    loadCampaignsForAdmin();
   }
 
   checkAuth();
