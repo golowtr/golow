@@ -1119,7 +1119,7 @@
     try {
       const { data, error } = await sb
         .from('campaign')
-        .select('*, airlines(name, logo_url)')
+        .select('*')
         .eq('active', true)
         .order('created_at', { ascending: false });
 
