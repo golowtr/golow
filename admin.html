@@ -823,16 +823,22 @@
     const name = document.getElementById('airlineName').value;
     if (!name) { showToast('Havayolu adı zorunlu', 'error'); return; }
 
-    showToast('Logo yükleniyor...');
-    const logoUrl = await uploadLogo(name);
+    showToast('Kaydediliyor...');
+    const newLogoUrl = await uploadLogo(name);
+
+    // Yeni logo yüklenmemişse mevcut URL'i koru
+    const existingLogoUrl = document.getElementById('airlineLogo').value || null;
+    const logoUrl = newLogoUrl || existingLogoUrl;
 
     const payload = {
       name,
       iata_code: document.getElementById('airlineIata').value.toUpperCase() || null,
       country: document.getElementById('airlineCountry').value || null,
-      logo_url: logoUrl,
       active: true
     };
+
+    // Logo varsa ekle, yoksa dokunma
+    if (logoUrl) payload.logo_url = logoUrl;
 
     const { error } = id
       ? await sb.from('airlines').update(payload).eq('id', id)
@@ -852,6 +858,15 @@
     document.getElementById('airlineIata').value = a.iata_code || '';
     document.getElementById('airlineCountry').value = a.country || '';
     document.getElementById('airlineLogo').value = a.logo_url || '';
+
+    // Mevcut logoyu önizlemede göster
+    if (a.logo_url) {
+      const preview = document.getElementById('airlineLogoPreview');
+      preview.src = a.logo_url;
+      preview.style.display = 'block';
+      document.getElementById('airlineLogoName').textContent = 'Mevcut logo';
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
