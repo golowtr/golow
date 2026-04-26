@@ -546,8 +546,14 @@
             <input type="text" class="form-input" id="airlineCountry" placeholder="Türkiye">
           </div>
           <div class="form-group">
-            <label class="form-label">Logo URL</label>
-            <input type="text" class="form-input" id="airlineLogo" placeholder="https://...">
+            <label class="form-label">Logo</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="file" id="airlineLogoFile" accept="image/*" onchange="previewLogo(this)" style="display:none">
+              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('airlineLogoFile').click()">📁 Dosya Seç</button>
+              <img id="airlineLogoPreview" style="width:32px;height:32px;border-radius:6px;object-fit:contain;border:1px solid var(--border);display:none;padding:2px;background:white">
+              <span id="airlineLogoName" style="font-size:12px;color:var(--muted)"></span>
+            </div>
+            <input type="hidden" id="airlineLogo">
           </div>
         </div>
         <div class="form-actions">
@@ -813,14 +819,19 @@
 
   async function saveAirline() {
     const id = document.getElementById('airlineEditId').value;
+    const name = document.getElementById('airlineName').value;
+    if (!name) { showToast('Havayolu adı zorunlu', 'error'); return; }
+
+    showToast('Logo yükleniyor...');
+    const logoUrl = await uploadLogo(name);
+
     const payload = {
-      name: document.getElementById('airlineName').value,
+      name,
       iata_code: document.getElementById('airlineIata').value.toUpperCase() || null,
       country: document.getElementById('airlineCountry').value || null,
-      logo_url: document.getElementById('airlineLogo').value || null,
+      logo_url: logoUrl,
       active: true
     };
-    if (!payload.name) { showToast('Havayolu adı zorunlu', 'error'); return; }
 
     const { error } = id
       ? await sb.from('airlines').update(payload).eq('id', id)
@@ -855,6 +866,9 @@
     document.getElementById('airlineFormTitle').textContent = 'Havayolu Ekle';
     document.getElementById('airlineFormIcon').textContent = '➕';
     ['airlineName','airlineIata','airlineCountry','airlineLogo'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('airlineLogoFile').value = '';
+    document.getElementById('airlineLogoPreview').style.display = 'none';
+    document.getElementById('airlineLogoName').textContent = '';
   }
 
   // ============ FLIGHTS ============
@@ -1130,6 +1144,36 @@
 
   function loadCampaigns() {
     loadCampaignsForAdmin();
+  }
+
+  // ============ LOGO UPLOAD ============
+  function previewLogo(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const preview = document.getElementById('airlineLogoPreview');
+    const name = document.getElementById('airlineLogoName');
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = 'block';
+    name.textContent = file.name;
+  }
+
+  async function uploadLogo(airlineName) {
+    const fileInput = document.getElementById('airlineLogoFile');
+    const file = fileInput.files[0];
+    if (!file) return document.getElementById('airlineLogo').value || null;
+
+    const ext = file.name.split('.').pop();
+    const fileName = `${airlineName.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.${ext}`;
+
+    const { data, error } = await sb.storage.from('logos').upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: true
+    });
+
+    if (error) { showToast('Logo yükleme hatası: ' + error.message, 'error'); return null; }
+
+    const { data: urlData } = sb.storage.from('logos').getPublicUrl(fileName);
+    return urlData.publicUrl;
   }
 
   checkAuth();
