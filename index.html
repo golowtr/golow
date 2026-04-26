@@ -831,9 +831,13 @@
           ${disc ? `<span class="price-discount">-%${disc}</span>` : ''}
         </div>
         <div class="card-meta">
-          ${f.departure_date ? `<span class="meta-item">📅 ${formatDate(f.departure_date)}</span>` : ''}
+          ${f.departure_date && f.return_date
+            ? `<span class="meta-item">📅 ${formatDate(f.departure_date)} – ${formatDate(f.return_date)}</span>`
+            : f.departure_date
+            ? `<span class="meta-item">📅 ${formatDate(f.departure_date)}</span>`
+            : ''}
           ${f.booking_deadline ? `<span class="meta-item">⏱️ ${formatDate(f.booking_deadline)}'e kadar</span>` : ''}
-          <span class="meta-item">✈️ ${f.trip_type === 'round_trip' ? 'Gidiş-dönüş' : 'Tek yön'}</span>
+          <span class="meta-item">${f.trip_type === 'round_trip' ? '🔄 Gidiş-dönüş' : '➡️ Tek yön'}</span>
         </div>
         <div class="card-footer">
           <div class="card-airline">${logo} ${f.airlines?.name || f.airline_id || ''}</div>
