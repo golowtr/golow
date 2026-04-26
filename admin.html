@@ -1179,17 +1179,37 @@
     if (!file) return document.getElementById('airlineLogo').value || null;
 
     const ext = file.name.split('.').pop();
-    const fileName = `${airlineName.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.${ext}`;
+    const fileName = `${airlineName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}-${Date.now()}.${ext}`;
 
-    const { data, error } = await sb.storage.from('logos').upload(fileName, file, {
-      cacheControl: '3600',
-      upsert: true
-    });
+    // Get current session token
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { showToast('Oturum bulunamadı', 'error'); return null; }
 
-    if (error) { showToast('Logo yükleme hatası: ' + error.message, 'error'); return null; }
+    // Upload with fetch using auth token
+    const formData = new FormData();
+    formData.append('', file);
 
-    const { data: urlData } = sb.storage.from('logos').getPublicUrl(fileName);
-    return urlData.publicUrl;
+    const response = await fetch(
+      `${SUPABASE_URL}/storage/v1/object/logos/${fileName}`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': SUPABASE_KEY,
+          'x-upsert': 'true'
+        },
+        body: file
+      }
+    );
+
+    if (!response.ok) {
+      const err = await response.text();
+      showToast('Logo yükleme hatası: ' + err, 'error');
+      return null;
+    }
+
+    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/logos/${fileName}`;
+    return publicUrl;
   }
 
   checkAuth();
