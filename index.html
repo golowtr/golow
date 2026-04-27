@@ -827,7 +827,48 @@
     .ticker-item { padding: 0 16px; gap: 8px; font-size: 12px; }
     .card { padding: 18px; }
     .card-actions { width: 100%; justify-content: flex-end; }
+    footer { margin-bottom: 70px; }
   }
+
+  .mobile-nav {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    .mobile-nav {
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 1px solid var(--border);
+      z-index: 200;
+      padding: 8px 0;
+      padding-bottom: env(safe-area-inset-bottom);
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+    }
+  }
+
+  .mobile-nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 6px 0;
+    transition: color 0.2s;
+  }
+
+  .mobile-nav-btn.active { color: var(--accent); }
+  .mobile-nav-btn .nav-icon { font-size: 20px; }
 
   .hidden { display: none !important; }
 </style>
@@ -962,6 +1003,22 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- MOBİL ALT NAV -->
+<div class="mobile-nav">
+  <button class="mobile-nav-btn active" id="mobileFlightsBtn" onclick="switchTab('flights', this); document.getElementById('mobileCampaignsBtn').classList.remove('active'); this.classList.add('active')">
+    <span class="nav-icon">✈️</span>
+    Uçuşlar
+  </button>
+  <button class="mobile-nav-btn" id="mobileCampaignsBtn" onclick="switchTab('campaigns', this); document.getElementById('mobileFlightsBtn').classList.remove('active'); this.classList.add('active')">
+    <span class="nav-icon">🔥</span>
+    Kampanyalar
+  </button>
+  <button class="mobile-nav-btn" onclick="document.getElementById('subscribe').scrollIntoView({behavior:'smooth'})">
+    <span class="nav-icon">🔔</span>
+    Bildirim Al
+  </button>
+</div>
 
 <script>
   const SUPABASE_URL = 'https://resssdiuypnweoaxpkoq.supabase.co';
@@ -1139,12 +1196,24 @@
         return;
       }
 
+      // Havayolu logolarını ayrıca çek
+      const airlineIds = [...new Set(campaigns.filter(c => c.airline_id).map(c => c.airline_id))];
+      let airlineMap = {};
+      if (airlineIds.length) {
+        const { data: airlines } = await sb.from('airlines').select('id, name, logo_url').in('id', airlineIds);
+        (airlines || []).forEach(a => { airlineMap[a.id] = a; });
+      }
+
       container.innerHTML = campaigns.map(c => {
         const discount = c.discount_type === 'ratio' ? `%${c.discount_value}` : `${c.discount_value}₺`;
+        const airline = airlineMap[c.airline_id];
+        const logo = airline?.logo_url
+          ? `<img src="${airline.logo_url}" style="width:32px;height:32px;border-radius:6px;object-fit:contain;background:rgba(255,255,255,0.2);padding:4px;vertical-align:middle;margin-right:8px" onerror="this.style.display='none'">`
+          : '';
         return `
           <div class="campaign-card">
             <div class="campaign-tag">🔥 KAMPANYA</div>
-            <div class="campaign-title">${c.title || 'Kampanya'}</div>
+            <div class="campaign-title" style="display:flex;align-items:center">${logo}${c.title || 'Kampanya'}</div>
             <div class="campaign-desc">${c.description || ''}</div>
             <div class="campaign-meta">
               ${c.discount_value ? `<span>💰 ${discount} indirim</span>` : ''}
